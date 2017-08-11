@@ -256,6 +256,12 @@ uploadArchives
 
 apply plugin: 'rio-library'
 
+rio
+{
+    library
+    { isPublic = true }
+}
+
 publishing {
     publications {
         rioLibrary(MavenPublication) {
