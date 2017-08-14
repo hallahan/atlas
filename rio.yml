@@ -3,24 +3,24 @@
 
 builds:
 # prb is intended to compile and test pending pull requests on the branch
-  - branchName: internal
+  - branchName: apple
     template: gradle:v3:lib:prb
     jdk: 1.8
 
-  - branchName: internal
+  - branchName: apple
     template: gradle:v3:app:snapshot
     jdk: 1.8
     deletionDate: 2050-07-15
 
 # build master everyday, 'H' means the time will be assigned by Jenkins 
-  - branchName: internal
+  - branchName: apple
     template: gradle:v3:app:build
     jdk: 1.8
     timerTrigger: H H * * *
     githubPushTrigger: false
 
 # build master to a release, when needed
-  - branchName: internal
+  - branchName: apple
     template: gradle:v3:app:release
     jdk: 1.8
     githubPushTrigger: false
