@@ -2,7 +2,7 @@ buildscript {
     dependencies {
         classpath 'com.diffplug.spotless:spotless-plugin-gradle:3.4.0'
         // Rio Addon
-        classpath 'com.apple.cie.rio:gradle-build-plugin:+'
+        classpath 'com.apple.cie.rio:gradle-build-plugin:latest.release'
     }
 }
 
@@ -21,6 +21,9 @@ apply plugin: 'maven'
 apply plugin: 'signing'
 apply plugin: "com.diffplug.gradle.spotless"
 apply plugin: 'idea'
+
+// Rio addons
+apply plugin: 'rio-library'
 
 sourceCompatibility=1.8
 targetCompatibility=1.8
@@ -252,24 +255,18 @@ uploadArchives
     }
 }
 
-// Rio addons
-
-apply plugin: 'rio-library'
-
 rio
 {
     library
     { isPublic = true }
 }
 
-publishing {
-    publications {
-        rioLibrary(MavenPublication) {
-            groupId project.group
-            artifactId project.name
-            artifact shaded {
-                classifier "shaded"
-            }
+publishing.publications {
+    rioLibrary(MavenPublication) {
+        groupId project.group
+        artifactId project.name
+        artifact shaded {
+            classifier "shaded"
         }
     }
 }
