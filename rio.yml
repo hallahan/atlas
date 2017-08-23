@@ -11,9 +11,6 @@ builds:
     template: gradle:v3:app:snapshot
     jdk: 1.8
     deletionDate: 2050-07-15
-    publish:
-      libraries:
-        repo: m2:oss-patched
 
 # build master everyday, 'H' means the time will be assigned by Jenkins 
   - branchName: apple
@@ -27,3 +24,7 @@ builds:
     template: gradle:v3:app:release
     jdk: 1.8
     githubPushTrigger: false
+    
+publish:
+  libraries:
+    repo: m2:oss-patched
