@@ -15,9 +15,6 @@ builds:
   - branchName: apple
     build:
       template: gradle:v3:app:snapshot
-    publish:
-      libraries:
-        repo: m2:oss-patched
     machine:
       java:
         version: 1.8
@@ -43,3 +40,8 @@ builds:
         version: 1.8
     trigger:
       gitPush: false
+
+# Publishing to repository without include/exclude setting, otherwise org artifacts are filtered out.
+publish:
+  libraries:
+    repo: m2:oss-patched
