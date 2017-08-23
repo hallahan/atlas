@@ -1,6 +1,12 @@
 # internal project uses simpler one-branch scheme: internal branch only. No dev to master etc, as that is handled in the public version.
 # dev and master come from the public version and should be touched only when the public changes are merged in
 
+publish:
+  reports:
+    junit: false
+  archives:
+    repo: m2:oss-patched
+
 builds:
 # prb is intended to compile and test pending pull requests on the branch
   - branchName: apple
