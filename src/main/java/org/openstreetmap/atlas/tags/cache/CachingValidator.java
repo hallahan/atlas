@@ -40,9 +40,14 @@ public class CachingValidator
      * Validators.from} is using this method implicitly. This method could be used on its own in
      * place of Validators.from.
      *
+     * @param <T>
+     *            the type of enum tag we're parsing
      * @param tagType
+     *            the enum style tag that we want a possible value from
      * @param taggable
-     * @return
+     *            the source of tags and their values
+     * @return an empty optional if the enum isn't a tag, doesn't have a key, the value isn't found
+     *         in taggable, or no enum value matches (ignoring case) the tag's value
      */
     public <T extends Enum<T>> Optional<T> from(final Class<T> tagType, final Taggable taggable)
     {
