@@ -242,7 +242,7 @@ public class Validators
     }
 
     /**
-     * Reflection version - use then you need to get a few tags, and no caching is necessary. This
+     * Reflection version - use when you need to get a few tags, and no caching is necessary. This
      * method is used by the caching version to populate the cache.
      * <p>
      * Helpful method for swizzling an Enum Tag into its possible value if that value is found in
