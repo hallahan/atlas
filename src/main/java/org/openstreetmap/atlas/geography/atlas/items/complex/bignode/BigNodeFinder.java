@@ -234,6 +234,7 @@ public class BigNodeFinder implements Finder<BigNode>
     private static final Distance SEARCH_RADIUS_SECONDARY = Distance.meters(40);
     private static final Distance SEARCH_RADIUS_TERTIARY = Distance.meters(35);
     private static final Distance SEARCH_RADIUS_RESIDENTIAL = Distance.meters(25);
+    private static final int MAXIMUM_DUAL_CARRIAGEWAY_ROUTE_SIZE = 10;
 
     private final EdgeDirectionComparator edgeDirectionComparator = new EdgeDirectionComparator();
 
@@ -269,7 +270,7 @@ public class BigNodeFinder implements Finder<BigNode>
                     // Expand Junction Edge to Junction Route before checking for Dual Carriage way
                     // intersection
                     final Optional<Route> junctionRoute = isDualCarriageWayJunctionRoute(
-                            candidateEdge);
+                            Route.forEdge(candidateEdge));
 
                     junctionRoute.ifPresent(route ->
                     {
@@ -354,7 +355,7 @@ public class BigNodeFinder implements Finder<BigNode>
     }
 
     /**
-     * Find the big nodes' restricted paths and save them as geojson in a resource
+     * Find restricted paths of all bignodes and save them as geojson in a resource
      *
      * @param atlas
      *            The atlas to look at
@@ -414,38 +415,61 @@ public class BigNodeFinder implements Finder<BigNode>
         return isDualCarriageWayRoute(Route.forEdge(candidateEdge));
     }
 
+    private Optional<Route> isDualCarriageWayJunctionRoute(final Route candidateJunctionRoute)
+    {
+        final Set<Route> candidateJunctionRoutes = new HashSet<>();
+        candidateJunctionRoutes.add(candidateJunctionRoute);
+        return isDualCarriageWayJunctionRoute(candidateJunctionRoutes);
+    }
+
     /**
      * Look through all the edges around this node and expand if edge is connected to another short
-     * Edge in same direction. TODO : Should we do this recursively for more than 2 edges?
+     * Edge in same direction.
      */
-    private Optional<Route> isDualCarriageWayJunctionRoute(final Edge candidateEdge)
+    private Optional<Route> isDualCarriageWayJunctionRoute(final Set<Route> candidateJunctionRoutes)
     {
-        final Set<Edge> expandableEdges = candidateEdge.outEdges().stream()
-                .filter(this::isCandidateJunctionEdge)
-                .filter(edge -> this.edgeDirectionComparator.isSameDirection(candidateEdge, edge,
-                        false))
-                .filter(edge -> edge.getIdentifier() != candidateEdge.getIdentifier())
-                .collect(Collectors.toSet());
-
-        if (expandableEdges.size() == 1)
+        if (candidateJunctionRoutes.size() == 0)
         {
-            Route route = null;
-            try
+            return Optional.empty();
+        }
+        // Maintain a set of expandable routes
+        final Set<Route> expandableJunctionRoutes = new HashSet<>();
+        for (final Route candidateJunctionRoute : candidateJunctionRoutes)
+        {
+            final Set<Edge> expandableEdges = candidateJunctionRoute.end().outEdges().stream()
+                    .filter(this::isCandidateJunctionEdge)
+                    .filter(edge -> this.edgeDirectionComparator
+                            .isSameDirection(candidateJunctionRoute.end(), edge, false))
+                    .filter(edge -> edge.getIdentifier() != candidateJunctionRoute.end()
+                            .getIdentifier())
+                    .collect(Collectors.toSet());
+
+            for (final Edge expandableEdge : expandableEdges)
             {
-                route = Route.forEdges(candidateEdge, expandableEdges.iterator().next());
-            }
-            catch (final CoreException e)
-            {
-                logger.warn("Could not attempt dual carriageway route with {}",
-                        candidateEdge.getIdentifier(), e);
-            }
-            if (isDualCarriageWayRoute(route))
-            {
-                logger.debug("Adding Dual Carriageway Junction Route : {}", route);
-                return Optional.of(route);
+                Route route = null;
+                try
+                {
+                    route = candidateJunctionRoute.append(expandableEdge);
+                }
+                catch (final CoreException e)
+                {
+                    logger.warn("Could not append dual carriageway route {} with with {}",
+                            candidateJunctionRoute, expandableEdge.getIdentifier(), e);
+                }
+                // If the routes are DualCarriageWayRoutes, then terminate.
+                if (isDualCarriageWayRoute(route))
+                {
+                    logger.debug("Adding Dual Carriageway Junction Route : {}", route);
+                    return Optional.of(route);
+                }
+                // Upper safety threshold to prevent bad edge cases
+                if (route.size() <= MAXIMUM_DUAL_CARRIAGEWAY_ROUTE_SIZE)
+                {
+                    expandableJunctionRoutes.add(route);
+                }
             }
         }
-        return Optional.empty();
+        return isDualCarriageWayJunctionRoute(expandableJunctionRoutes);
     }
 
     private boolean isDualCarriageWayRoute(final Route candidateRoute)
