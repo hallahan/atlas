@@ -147,23 +147,17 @@ public class ComplexTurnRestrictionTest
             final Set<Route> allPaths = bigNode.allPaths();
             if (allPaths.size() > 0)
             {
-                for (final Route path : allPaths)
-                {
-                    if (path.equals(path1))
-                    {
-                        final Set<RestrictedPath> restrictions = bigNode.turnRestrictions();
-                        Assert.assertTrue(restrictions.size() == 1);
+                final Set<RestrictedPath> restrictions = bigNode.turnRestrictions();
+                Assert.assertTrue(restrictions.size() == 1);
 
-                        final Route restrictedRoute = restrictions.iterator().next().getRoute();
-                        Assert.assertNotEquals(restrictedRoute, path1);
-                        Assert.assertNotEquals(restrictedRoute, path2);
+                final Route restrictedRoute = restrictions.iterator().next().getRoute();
+                Assert.assertNotEquals(restrictedRoute, path1);
+                Assert.assertNotEquals(restrictedRoute, path2);
 
-                        // Only one path should be the restricted one as it fully covers the turn
-                        // restriction. The other paths all overlap the restriction, but only
-                        // partially.
-                        Assert.assertEquals(restrictedRoute, path3);
-                    }
-                }
+                // Only one path should be the restricted one as it fully covers the turn
+                // restriction. The other paths all overlap the restriction, but only
+                // partially.
+                Assert.assertEquals(restrictedRoute, path3);
             }
         }
     }
