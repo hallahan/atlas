@@ -73,7 +73,7 @@ public class BigNodeFinderTest extends AtlasLoadingCommand
                 .asList(new BigNodeFinder().find(this.setup.getAtlas()));
         bigNodes.forEach(complexEntity -> logger.info("{}", complexEntity.toString()));
         logger.info("Total Number of big Nodes :{}", bigNodes.size());
-        Assert.assertEquals("Total Number of big Nodes (Simple + Dual Carrriage Way)", 54,
+        Assert.assertEquals("Total Number of big Nodes (Simple + Dual Carrriage Way)", 58,
                 bigNodes.size());
         final Set<BigNode> dualCarriageWayBigNodes = bigNodes.stream()
                 .filter(bigNode -> bigNode.getType().equals(Type.DUAL_CARRIAGEWAY))
@@ -95,7 +95,7 @@ public class BigNodeFinderTest extends AtlasLoadingCommand
                 .forEach(nodeId -> Assert.assertTrue(dualCarriageWayNodes.contains(nodeId)));
 
         // Node Identifiers where bigNodes shouldn't be added
-        final Long[] expectedSimpleNodeIdentifiers = { 62L, 63L };
+        final Long[] expectedSimpleNodeIdentifiers = { 62L, 63L, 88L, 89L };
         final Set<Long> expectedSimpleNodeIdentifiersSet = new HashSet<>(
                 Arrays.asList(expectedSimpleNodeIdentifiers));
         dualCarriageWayBigNodes.forEach(bigNode -> bigNode.nodes().forEach(node -> Assert
