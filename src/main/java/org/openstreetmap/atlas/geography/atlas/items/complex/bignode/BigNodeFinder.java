@@ -1,6 +1,5 @@
 package org.openstreetmap.atlas.geography.atlas.items.complex.bignode;
 
-import static org.openstreetmap.atlas.tags.HighwayTag.isCarNavigableHighway;
 import static org.openstreetmap.atlas.tags.names.NameFinder.STANDARD_TAGS;
 
 import java.io.Serializable;
@@ -466,9 +465,9 @@ public class BigNodeFinder implements Finder<BigNode>
         {
             for (final Edge inEdge : candidateRoute.start().inEdges())
             {
-                // If inEdge is not car navigable or has the same name as
+                // If inEdge is less important than RESIDENTIAL or has the same name as
                 // candidateEdge or has the same Heading as candidateEdge, then skip
-                if (!isCarNavigableHighway(inEdge)
+                if (inEdge.highwayTag().isLessImportantThan(HighwayTag.RESIDENTIAL)
                         || this.edgeDirectionComparator.isSameDirection(candidateRoute.start(),
                                 inEdge, false)
                         || edgeNameFuzzyMatch(candidateRoute.start(), inEdge, true))
@@ -478,9 +477,12 @@ public class BigNodeFinder implements Finder<BigNode>
                 // If the candidateRoute has inEdge and outEdge that are in opposite direction
                 for (final Edge outEdge : candidateRoute.end().outEdges())
                 {
-                    // Usually Dual Carriage Way roads are one way. outEdge and inEdge cannot
-                    // have name mismatch
-                    if (isCarNavigableHighway(outEdge)
+                    /*
+                     * Usually Dual Carriage Way roads are one way. OutEdge and inEdge cannot have
+                     * name mismatch. Including other Car Navigable roads like Service roads
+                     * increases false positive cases.
+                     */
+                    if (outEdge.highwayTag().isMoreImportantThanOrEqualTo(HighwayTag.RESIDENTIAL)
                             && this.edgeDirectionComparator.isOppositeDirection(inEdge, outEdge,
                                     false)
                             && !outEdge.hasReverseEdge() && !inEdge.hasReverseEdge()
