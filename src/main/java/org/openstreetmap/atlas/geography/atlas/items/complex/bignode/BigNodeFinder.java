@@ -477,8 +477,11 @@ public class BigNodeFinder implements Finder<BigNode>
                 // If the candidateRoute has inEdge and outEdge that are in opposite direction
                 for (final Edge outEdge : candidateRoute.end().outEdges())
                 {
-                    // Usually Dual Carriage Way roads are one way. outEdge and inEdge cannot
-                    // have name mismatch
+                    /*
+                     * Usually Dual Carriage Way roads are one way. OutEdge and inEdge cannot have
+                     * name mismatch. Including other Car Navigable roads like Service roads
+                     * increases false positive cases.
+                     */
                     if (outEdge.highwayTag().isMoreImportantThanOrEqualTo(HighwayTag.RESIDENTIAL)
                             && this.edgeDirectionComparator.isOppositeDirection(inEdge, outEdge,
                                     false)
