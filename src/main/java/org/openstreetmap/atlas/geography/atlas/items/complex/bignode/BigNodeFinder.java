@@ -438,10 +438,10 @@ public class BigNodeFinder implements Finder<BigNode>
         {
             final Set<Edge> expandableEdges = candidateJunctionRoute.end().outEdges().stream()
                     .filter(this::isCandidateJunctionEdge)
+                    .filter(edge -> edge.getMasterEdgeIdentifier() != candidateJunctionRoute.end()
+                            .getMasterEdgeIdentifier())
                     .filter(edge -> this.edgeDirectionComparator
                             .isSameDirection(candidateJunctionRoute.end(), edge, false))
-                    .filter(edge -> edge.getIdentifier() != candidateJunctionRoute.end()
-                            .getIdentifier())
                     .collect(Collectors.toSet());
 
             for (final Edge expandableEdge : expandableEdges)
@@ -530,24 +530,21 @@ public class BigNodeFinder implements Finder<BigNode>
         if (isCandidateJunctionEdge(candidateEdge))
         {
             final Set<Edge> candidateRouteEdges = Sets.newHashSet(candidateRoute);
+            // Remove the first edge of a multi-edge route to ensure bigger routes have a cycle
+            if (candidateRoute.size() > 1)
+            {
+                candidateRouteEdges.remove(candidateRoute.start());
+            }
             final Set<Long> candidateRouteEdgeIds = candidateRouteEdges.stream()
                     .map(edge -> edge.getIdentifier()).collect(Collectors.toSet());
 
             final Set<Long> filteredJunctionEdgeIds = Sets.difference(junctionEdgeIds,
                     candidateRouteEdgeIds);
-
-            final Set<Edge> candidateJunctionEdges = candidateRouteEdges.stream()
-                    .filter(edge -> !junctionEdgeIds.contains(edge.getIdentifier()))
-                    .collect(Collectors.toSet());
-
             for (final Edge edge : candidateEdge.outEdges())
             {
-                // Check if the edge is parallel to any of the junction Edges in the
-                // candidateRoute and if edge is connected to a junctionEdge with same name. Unless
-                // there is a name mismatch we merge them
+                // Check if edge is connected to a junctionEdge with same name. Unless
+                // there is a name mismatch we merge them.
                 if (filteredJunctionEdgeIds.contains(edge.getIdentifier())
-                        && this.edgeDirectionComparator.isParallel(edge, candidateJunctionEdges,
-                                false)
                         && edgeNameFuzzyMatch(candidateRoute.end(), edge, false))
                 {
                     return true;
@@ -590,8 +587,13 @@ public class BigNodeFinder implements Finder<BigNode>
         final Set<Edge> mergeCandidates = new TreeSet<>((edge1, edge2) -> ComparisonChain.start()
                 .compare(edge1.getIdentifier(), edge2.getIdentifier()).result());
 
+        final Set<Long> masterEdgeIdentifiers = new HashSet<>();
+        candidateRoute.forEach(edge -> masterEdgeIdentifiers.add(edge.getMasterEdgeIdentifier()));
+
         connectedEdges.stream().filter(edge -> junctionEdgeIds.contains(edge.getIdentifier()))
-                .filter(edge -> !candidateRoute.includes(edge)).forEach(mergeCandidates::add);
+                .filter(edge -> !candidateRoute.includes(edge))
+                .filter(edge -> !masterEdgeIdentifiers.contains(edge.getMasterEdgeIdentifier()))
+                .forEach(mergeCandidates::add);
         /*
          * There are some cases where we have a couple of junction edges (instead of all four) that
          * are part of big node
@@ -599,6 +601,7 @@ public class BigNodeFinder implements Finder<BigNode>
         if (mergeCandidates.isEmpty())
         {
             connectedEdges.stream().filter(edge -> !junctionEdgeIds.contains(edge.getIdentifier()))
+                    .filter(edge -> !masterEdgeIdentifiers.contains(edge.getMasterEdgeIdentifier()))
                     .filter(edge -> isMergeCandidateEdge(edge, candidateRoute, junctionEdgeIds))
                     .filter(edge -> !candidateRoute.includes(edge)).forEach(mergeCandidates::add);
         }
