@@ -182,7 +182,7 @@ public final class TurnRestriction implements Located, Serializable
             final TurnRestriction turnRestriction, final Route route)
     {
         final Optional<Route> possibleVia = turnRestriction.getVia();
-        final boolean viaMatches = possibleVia.isPresent() ? possibleVia.get().isSubRoute(route)
+        final boolean viaMatches = possibleVia.isPresent() ? route.isSubRoute(possibleVia.get())
                 : true;
         return viaMatches && route.isSubRoute(turnRestriction.getTo())
                 && route.isSubRoute(turnRestriction.getFrom());
