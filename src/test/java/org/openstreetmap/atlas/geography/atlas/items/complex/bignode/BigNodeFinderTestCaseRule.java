@@ -543,6 +543,12 @@ public class BigNodeFinderTestCaseRule extends CoreTestRule
     @TestAtlas(loadFromTextResource = "overlap.atlas.txt.gz")
     private Atlas overlapAtlas;
 
+    /*
+     * Intersections that test expansion of big nodes
+     */
+    @TestAtlas(loadFromTextResource = "expand.atlas.txt.gz")
+    private Atlas expandAtlas;
+
     public Atlas getAtlas()
     {
         return this.atlas;
@@ -551,6 +557,11 @@ public class BigNodeFinderTestCaseRule extends CoreTestRule
     public Atlas getComplexJunctionAtlas()
     {
         return this.complexJunctionAtlas;
+    }
+
+    public Atlas getExpandBigNodeAtlas()
+    {
+        return this.expandAtlas;
     }
 
     public Atlas getOverlapAtlas()
