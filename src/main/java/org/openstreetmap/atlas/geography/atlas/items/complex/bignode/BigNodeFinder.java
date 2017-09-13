@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -183,7 +184,7 @@ public class BigNodeFinder implements Finder<BigNode>
                                 .toComparison());
                 bigNodeCandidate.nodeIdentifiers
                         .forEach(nodeIdentifier -> nodes.add(this.atlas.node(nodeIdentifier)));
-                if (nodes.size() > 0)
+                if (!nodes.isEmpty())
                 {
                     final Node sourceNode = nodes.iterator().next();
                     final BigNode bigNode = new BigNode(sourceNode, nodes, Type.DUAL_CARRIAGEWAY);
@@ -234,7 +235,11 @@ public class BigNodeFinder implements Finder<BigNode>
     private static final Distance SEARCH_RADIUS_SECONDARY = Distance.meters(40);
     private static final Distance SEARCH_RADIUS_TERTIARY = Distance.meters(35);
     private static final Distance SEARCH_RADIUS_RESIDENTIAL = Distance.meters(25);
-    private static final int MAXIMUM_DUAL_CARRIAGEWAY_ROUTE_SIZE = 10;
+    /**
+     * This is maximum number of edges in dual carriage way route and is used as safety threshold to
+     * prevent bad edge cases while constructing the big node
+     */
+    private static final int MAXIMUM_DUAL_CARRIAGEWAY_ROUTE_SIZE = 20;
 
     private final EdgeDirectionComparator edgeDirectionComparator = new EdgeDirectionComparator();
 
@@ -417,7 +422,7 @@ public class BigNodeFinder implements Finder<BigNode>
 
     private Optional<Route> isDualCarriageWayJunctionRoute(final Route candidateJunctionRoute)
     {
-        final Set<Route> candidateJunctionRoutes = new HashSet<>();
+        final Set<Route> candidateJunctionRoutes = new LinkedHashSet<>();
         candidateJunctionRoutes.add(candidateJunctionRoute);
         return isDualCarriageWayJunctionRoute(candidateJunctionRoutes);
     }
@@ -428,21 +433,21 @@ public class BigNodeFinder implements Finder<BigNode>
      */
     private Optional<Route> isDualCarriageWayJunctionRoute(final Set<Route> candidateJunctionRoutes)
     {
-        if (candidateJunctionRoutes.size() == 0)
+        if (candidateJunctionRoutes.isEmpty())
         {
             return Optional.empty();
         }
-        // Maintain a set of expandable routes
-        final Set<Route> expandableJunctionRoutes = new HashSet<>();
+        // Maintain a set of expandable routes.
+        final Set<Route> expandableJunctionRoutes = new LinkedHashSet<>();
         for (final Route candidateJunctionRoute : candidateJunctionRoutes)
         {
-            final Set<Edge> expandableEdges = candidateJunctionRoute.end().outEdges().stream()
-                    .filter(this::isCandidateJunctionEdge)
+            final Set<Edge> expandableEdges = new LinkedHashSet<>();
+            candidateJunctionRoute.end().outEdges().stream().filter(this::isCandidateJunctionEdge)
                     .filter(edge -> edge.getMasterEdgeIdentifier() != candidateJunctionRoute.end()
                             .getMasterEdgeIdentifier())
                     .filter(edge -> this.edgeDirectionComparator
                             .isSameDirection(candidateJunctionRoute.end(), edge, false))
-                    .collect(Collectors.toSet());
+                    .forEach(expandableEdges::add);
 
             for (final Edge expandableEdge : expandableEdges)
             {
@@ -456,7 +461,7 @@ public class BigNodeFinder implements Finder<BigNode>
                     logger.warn("Could not append dual carriageway route {} with with {}",
                             candidateJunctionRoute, expandableEdge.getIdentifier(), e);
                 }
-                // If the routes are DualCarriageWayRoutes, then terminate.
+                // If the routes are DualCarriageWayRoutes, then return
                 if (isDualCarriageWayRoute(route))
                 {
                     logger.debug("Adding Dual Carriageway Junction Route : {}", route);
@@ -466,6 +471,12 @@ public class BigNodeFinder implements Finder<BigNode>
                 if (route.size() <= MAXIMUM_DUAL_CARRIAGEWAY_ROUTE_SIZE)
                 {
                     expandableJunctionRoutes.add(route);
+                }
+                else
+                {
+                    logger.debug(
+                            "Maximum number of edges in dual carriageway route  ({}) reached. Skipping route : {}",
+                            MAXIMUM_DUAL_CARRIAGEWAY_ROUTE_SIZE, route);
                 }
             }
         }
