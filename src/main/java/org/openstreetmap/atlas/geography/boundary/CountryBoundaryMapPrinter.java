@@ -31,7 +31,7 @@ public class CountryBoundaryMapPrinter extends Command
     public static final Switch<File> OUTPUT = new Switch<>("output", "The output folder",
             value -> new File(value), Optionality.REQUIRED);
     public static final Flag OUTPUT_WKT = new Flag("wkt",
-            "The optional switch to output in wkt format", Optionality.OPTIONAL);
+            "The optional flag to output in wkt format", Optionality.OPTIONAL);
 
     private static final JtsMultiPolygonToMultiPolygonConverter JTS_MULTI_POLYGON_TO_MULTI_POLYGON_CONVERTER = new JtsMultiPolygonToMultiPolygonConverter();
 
