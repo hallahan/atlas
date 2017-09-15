@@ -96,7 +96,6 @@ configurations
 dependencies
 {
     compile packages.slf4j.api
-    compile packages.slf4j.log4j12
     compile packages.junit
     testCompile packages.slf4j.log4j12
     testCompile packages.log4j
