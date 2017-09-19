@@ -76,9 +76,9 @@ public class AtlasResourceLoader
         }
         else if (size > 1)
         {
-            final MultiAtlas result = this.atlasEntityFilter != null
-                    ? MultiAtlas.loadFromPackedAtlas(resources, this.atlasEntityFilter)
-                    : MultiAtlas.loadFromPackedAtlas(resources);
+            final MultiAtlas result = this.atlasEntityFilter == null
+                    ? MultiAtlas.loadFromPackedAtlas(resources)
+                    : MultiAtlas.loadFromPackedAtlas(resources, this.atlasEntityFilter);
             if (this.multiAtlasName != null)
             {
                 result.setName(this.multiAtlasName);
