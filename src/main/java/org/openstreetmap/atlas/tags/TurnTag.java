@@ -19,7 +19,7 @@ import org.openstreetmap.atlas.utilities.collections.OptionalIterable;
  *
  * @author brian_l_davis
  */
-@Tag(value = Validation.NON_EMPTY_STRING, taginfo = "http://taginfo.openstreetmap.org/keys/turn%3Alanes#values", osm = "https://wiki.openstreetmap.org/wiki/Key:turn")
+@Tag(value = Validation.NON_EMPTY_STRING, taginfo = "http://taginfo.openstreetmap.org/keys/turn#values", osm = "https://wiki.openstreetmap.org/wiki/Key:turn")
 public interface TurnTag
 {
     @TagKey
