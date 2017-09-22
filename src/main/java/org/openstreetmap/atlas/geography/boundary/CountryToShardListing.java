@@ -1,10 +1,12 @@
 package org.openstreetmap.atlas.geography.boundary;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.openstreetmap.atlas.exception.CoreException;
+import org.openstreetmap.atlas.geography.MultiPolygon;
+import org.openstreetmap.atlas.geography.clipping.Clip;
+import org.openstreetmap.atlas.geography.clipping.Clip.ClipType;
 import org.openstreetmap.atlas.geography.sharding.CountryShard;
 import org.openstreetmap.atlas.geography.sharding.Shard;
 import org.openstreetmap.atlas.geography.sharding.Sharding;
@@ -55,35 +57,33 @@ public class CountryToShardListing extends Command
     {
         try (SafeBufferedWriter writer = output.writer())
         {
-            countries.forEach(country ->
+            for (final String country : countries)
             {
                 logger.info("Processing country {}", country);
                 final Time start = Time.now();
-                final List<CountryBoundary> countryBoundaries = boundaries.countryBoundary(country);
-                final Set<CountryShard> shards = new HashSet<>();
-                countryBoundaries.forEach(countryBoundary ->
+                final Set<Shard> intersectingShards = new HashSet<>();
+                final MultiPolygon countryBoundary = boundaries.countryBoundary(country).get(0)
+                        .getBoundary();
+                final Iterable<? extends Shard> potentialShards = sharding
+                        .shards(countryBoundary.bounds());
+                for (final Shard shard : potentialShards)
                 {
-                    countryBoundary.getBoundary().outers().forEach(polygon ->
+                    final Clip clip = new Clip(ClipType.AND, shard.bounds(), countryBoundary);
+                    if (clip.getClipMultiPolygon().surface().asKilometerSquared() != 0)
                     {
-                        sharding.shards(polygon).forEach(shard ->
+                        intersectingShards.add(shard);
+                        try
                         {
-                            shards.add(new CountryShard(country, shard));
-                        });
-                    });
-                });
-                shards.forEach(shard ->
-                {
-                    try
-                    {
-                        writer.writeLine(shard.toString());
+                            writer.writeLine(new CountryShard(country, shard).toString());
+                        }
+                        catch (final Exception e)
+                        {
+                            throw new CoreException("Unable to write to {}", output, e);
+                        }
                     }
-                    catch (final Exception e)
-                    {
-                        throw new CoreException("Unable to write to {}", output, e);
-                    }
-                });
+                }
                 logger.info("Processed country {} in {}", country, start.elapsedSince());
-            });
+            }
         }
         catch (final Exception e)
         {
