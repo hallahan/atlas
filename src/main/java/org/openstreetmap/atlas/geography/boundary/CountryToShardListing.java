@@ -1,7 +1,6 @@
 package org.openstreetmap.atlas.geography.boundary;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
 import org.openstreetmap.atlas.exception.CoreException;
 import org.openstreetmap.atlas.geography.MultiPolygon;
@@ -24,6 +23,7 @@ import org.slf4j.LoggerFactory;
  * List all the {@link Shard}s for each country
  *
  * @author matthieun
+ * @author james-gage
  */
 public class CountryToShardListing extends Command
 {
@@ -57,33 +57,44 @@ public class CountryToShardListing extends Command
     {
         try (SafeBufferedWriter writer = output.writer())
         {
-            for (final String country : countries)
+            countries.forEach(country ->
             {
                 logger.info("Processing country {}", country);
                 final Time start = Time.now();
-                final Set<Shard> intersectingShards = new HashSet<>();
-                final MultiPolygon countryBoundary = boundaries.countryBoundary(country).get(0)
-                        .getBoundary();
-                final Iterable<? extends Shard> potentialShards = sharding
-                        .shards(countryBoundary.bounds());
-                for (final Shard shard : potentialShards)
+                final List<CountryBoundary> countryBoundaries = boundaries.countryBoundary(country);
+                if (countryBoundaries != null)
                 {
-                    final Clip clip = new Clip(ClipType.AND, shard.bounds(), countryBoundary);
-                    if (clip.getClipMultiPolygon().surface().asKilometerSquared() != 0)
+                    // for countries split by the Meridian line there will be two
+                    // countryBoundaries
+                    for (final CountryBoundary countryBound : countryBoundaries)
                     {
-                        intersectingShards.add(shard);
-                        try
+                        final MultiPolygon countryBoundary = countryBound.getBoundary();
+                        final Iterable<? extends Shard> potentialShards = sharding
+                                .shards(countryBoundary.bounds());
+                        potentialShards.forEach(shard ->
                         {
-                            writer.writeLine(new CountryShard(country, shard).toString());
-                        }
-                        catch (final Exception e)
-                        {
-                            throw new CoreException("Unable to write to {}", output, e);
-                        }
+                            final Clip clip = new Clip(ClipType.AND, shard.bounds(),
+                                    countryBoundary);
+                            if (clip.getClipMultiPolygon().surface().asKilometerSquared() > 0)
+                            {
+                                try
+                                {
+                                    writer.writeLine(new CountryShard(country, shard).toString());
+                                }
+                                catch (final Exception e)
+                                {
+                                    throw new CoreException("Unable to write to {}", output, e);
+                                }
+                            }
+                        });
                     }
+                    logger.info("Processed country {} in {}", country, start.elapsedSince());
                 }
-                logger.info("Processed country {} in {}", country, start.elapsedSince());
-            }
+                else
+                {
+                    logger.info("Failed to process: {} is not a valid country name", country);
+                }
+            });
         }
         catch (final Exception e)
         {
