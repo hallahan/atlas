@@ -474,7 +474,7 @@ public class BigNodeFinder implements Finder<BigNode>
                 }
                 else
                 {
-                    logger.debug(
+                    logger.trace(
                             "Maximum number of edges in dual carriageway route  ({}) reached. Skipping route : {}",
                             MAXIMUM_DUAL_CARRIAGEWAY_ROUTE_SIZE, route);
                 }
