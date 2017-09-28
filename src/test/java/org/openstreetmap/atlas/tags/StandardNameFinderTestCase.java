@@ -20,9 +20,21 @@ import org.openstreetmap.atlas.utilities.testing.TestTaggable;
  *
  * @author cstaylor
  */
-public class StandardNameFinderTestCase
+public class StandardNameFinderTestCase extends AbstractNameFinderTestCase
 {
     private Taggable taggable;
+
+    @Test
+    public void serializedStandardAll() throws Exception
+    {
+        final Map<Class<?>, String> all = freezeDry(
+                NameFinder.createStandardSet(IsoLanguage.forLanguageCode("en").get()))
+                        .all(this.taggable);
+        Assert.assertEquals(2, all.size());
+        Assert.assertEquals("Test", all.get(NameTag.class));
+        Assert.assertEquals("Real Test", all.get(AlternativeNameTag.class));
+        Assert.assertFalse(all.containsKey(InternationallyKnownAsTag.class));
+    }
 
     @Before
     public void setUp()

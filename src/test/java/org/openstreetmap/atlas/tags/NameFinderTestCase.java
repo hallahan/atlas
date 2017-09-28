@@ -20,7 +20,7 @@ import org.openstreetmap.atlas.utilities.testing.TestTaggable;
  *
  * @author cstaylor
  */
-public class NameFinderTestCase
+public class NameFinderTestCase extends AbstractNameFinderTestCase
 {
     private Taggable taggable;
 
@@ -36,11 +36,11 @@ public class NameFinderTestCase
     }
 
     @Test
-    public void testAllEnglish()
+    public void testAllEnglish() throws Exception
     {
-        final Map<Class<?>, String> all = new NameFinder()
-                .withTags(NameTag.class, AlternativeNameTag.class)
-                .inLanguage(IsoLanguage.forLanguageCode("en").get()).all(this.taggable);
+        final Map<Class<?>, String> all = freezeDry(
+                new NameFinder().withTags(NameTag.class, AlternativeNameTag.class)
+                        .inLanguage(IsoLanguage.forLanguageCode("en").get())).all(this.taggable);
         Assert.assertEquals(2, all.size());
         Assert.assertEquals("Test", all.get(NameTag.class));
         Assert.assertEquals("Real Test", all.get(AlternativeNameTag.class));
@@ -48,11 +48,11 @@ public class NameFinderTestCase
     }
 
     @Test
-    public void testAllRussian()
+    public void testAllRussian() throws Exception
     {
-        final Map<Class<?>, String> all = new NameFinder()
-                .withTags(NameTag.class, AlternativeNameTag.class)
-                .inLanguage(IsoLanguage.forLanguageCode("ru").get()).all(this.taggable);
+        final Map<Class<?>, String> all = freezeDry(
+                new NameFinder().withTags(NameTag.class, AlternativeNameTag.class)
+                        .inLanguage(IsoLanguage.forLanguageCode("ru").get())).all(this.taggable);
         Assert.assertEquals(2, all.size());
         Assert.assertEquals("nyet", all.get(NameTag.class));
         Assert.assertEquals("Real Test", all.get(AlternativeNameTag.class));
@@ -60,27 +60,28 @@ public class NameFinderTestCase
     }
 
     @Test
-    public void testBestEnglishName()
+    public void testBestEnglishName() throws Exception
     {
-        final Optional<String> value = new NameFinder().withTags(NameTag.class)
-                .inLanguage(IsoLanguage.forLanguageCode("en").get()).best(this.taggable);
+        final Optional<String> value = freezeDry(new NameFinder().withTags(NameTag.class)
+                .inLanguage(IsoLanguage.forLanguageCode("en").get())).best(this.taggable);
         Assert.assertTrue(value.isPresent());
         Assert.assertEquals("Test", value.get());
     }
 
     @Test
-    public void testBestName()
+    public void testBestName() throws Exception
     {
-        final Optional<String> value = new NameFinder().withTags(NameTag.class).best(this.taggable);
+        final Optional<String> value = freezeDry(new NameFinder().withTags(NameTag.class))
+                .best(this.taggable);
         Assert.assertTrue(value.isPresent());
         Assert.assertEquals("Test", value.get());
     }
 
     @Test
-    public void testBestRussianName()
+    public void testBestRussianName() throws Exception
     {
-        final Optional<String> value = new NameFinder().withTags(NameTag.class)
-                .inLanguage(IsoLanguage.forLanguageCode("ru").get()).best(this.taggable);
+        final Optional<String> value = freezeDry(new NameFinder().withTags(NameTag.class)
+                .inLanguage(IsoLanguage.forLanguageCode("ru").get())).best(this.taggable);
         Assert.assertTrue(value.isPresent());
         Assert.assertEquals("nyet", value.get());
     }
