@@ -25,14 +25,14 @@ public class FreezeDryFunction<T extends Serializable> implements Function<T, T>
     {
         try
         {
-            final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            final ObjectOutputStream oos = new ObjectOutputStream(baos);
-            oos.writeObject(source);
-            oos.close();
-            final ObjectInputStream ois = new ObjectInputStream(
-                    new ByteArrayInputStream(baos.toByteArray()));
+            final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            final ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
+            objectOutputStream.writeObject(source);
+            objectOutputStream.close();
+            final ObjectInputStream objectInputStream = new ObjectInputStream(
+                    new ByteArrayInputStream(byteArrayOutputStream.toByteArray()));
             @SuppressWarnings("unchecked")
-            final T result = (T) ois.readObject();
+            final T result = (T) objectInputStream.readObject();
             return result;
         }
         catch (final Exception oops)
