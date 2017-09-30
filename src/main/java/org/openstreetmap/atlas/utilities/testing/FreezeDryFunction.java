@@ -26,7 +26,8 @@ public class FreezeDryFunction<T extends Serializable> implements Function<T, T>
         try
         {
             final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            final ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
+            final ObjectOutputStream objectOutputStream = new ObjectOutputStream(
+                    byteArrayOutputStream);
             objectOutputStream.writeObject(source);
             objectOutputStream.close();
             final ObjectInputStream objectInputStream = new ObjectInputStream(
