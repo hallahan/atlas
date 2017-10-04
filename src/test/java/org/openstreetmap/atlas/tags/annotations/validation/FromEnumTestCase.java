@@ -47,7 +47,7 @@ public class FromEnumTestCase
     @Test
     public void testAnnotationExists()
     {
-        final TestingTaggable testing = new TestingTaggable(EightBall.KEY, "maYbE");
+        final TestTaggable testing = new TestTaggable(EightBall.KEY, "maYbE");
         final Optional<EightBall> found = Validators.fromAnnotation(EightBall.class, testing);
         Assert.assertTrue(found.isPresent());
         Assert.assertEquals(EightBall.MAYBE, found.get());
@@ -56,7 +56,7 @@ public class FromEnumTestCase
     @Test
     public void testAnnotationIllegalValue()
     {
-        final TestingTaggable testing = new TestingTaggable(EightBall.KEY, "Nope");
+        final TestTaggable testing = new TestTaggable(EightBall.KEY, "Nope");
         final Optional<EightBall> found = Validators.fromAnnotation(EightBall.class, testing);
         Assert.assertFalse(found.isPresent());
     }
@@ -64,7 +64,7 @@ public class FromEnumTestCase
     @Test
     public void testAnnotationMissingValue()
     {
-        final TestingTaggable testing = new TestingTaggable(BuildingTag.KEY, "Nope");
+        final TestTaggable testing = new TestTaggable(BuildingTag.KEY, "Nope");
         final Optional<EightBall> found = Validators.fromAnnotation(EightBall.class, testing);
         Assert.assertFalse(found.isPresent());
     }
