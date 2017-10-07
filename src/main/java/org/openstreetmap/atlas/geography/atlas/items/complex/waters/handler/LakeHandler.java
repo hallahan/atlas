@@ -31,7 +31,7 @@ public class LakeHandler extends AbstractWaterHandler
          */
         if (Validators.isOfType(atlasEntity, NaturalTag.class, NaturalTag.WATER))
         {
-            if (Validators.isOfType(atlasEntity, WaterTag.class, WaterTag.LAKE))
+            if (Validators.isOfType(atlasEntity, WaterTag.class, WaterTag.LAKE, WaterTag.OXBOW))
             {
                 return true;
             }
@@ -41,8 +41,6 @@ public class LakeHandler extends AbstractWaterHandler
             {
                 return false;
             }
-            // TBD : Should we add oxbow lake to this? natural=water water=oxbow
-            // According to OSM : this is the default when no water tag is specified
             return !atlasEntity.getTag(WaterTag.KEY).isPresent();
         }
         return false;

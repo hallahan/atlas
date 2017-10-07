@@ -1,4 +1,4 @@
-package org.openstreetmap.atlas.geography.atlas.items.complex.waters;
+package org.openstreetmap.atlas.geography.atlas.items.complex.water;
 
 import org.openstreetmap.atlas.geography.PolyLine;
 import org.openstreetmap.atlas.geography.Polygon;

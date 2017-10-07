@@ -13,6 +13,7 @@ import org.openstreetmap.atlas.geography.atlas.items.complex.Finder;
 import org.openstreetmap.atlas.geography.atlas.items.complex.waters.handler.CanalHandler;
 import org.openstreetmap.atlas.geography.atlas.items.complex.waters.handler.CreekHandler;
 import org.openstreetmap.atlas.geography.atlas.items.complex.waters.handler.DitchHandler;
+import org.openstreetmap.atlas.geography.atlas.items.complex.waters.handler.HarbourHandler;
 import org.openstreetmap.atlas.geography.atlas.items.complex.waters.handler.LagoonHandler;
 import org.openstreetmap.atlas.geography.atlas.items.complex.waters.handler.LakeHandler;
 import org.openstreetmap.atlas.geography.atlas.items.complex.waters.handler.PondHandler;
@@ -35,15 +36,16 @@ public class ComplexWaterEntityFinder implements Finder<ComplexWaterEntity>
     {
         this.handlers = new HashMap<>();
 
-        this.handlers.put(WaterType.LAKE, new LakeHandler());
-        this.handlers.put(WaterType.RESERVOIR, new ReservoirHandler());
-        this.handlers.put(WaterType.RIVER, new RiverHandler());
         this.handlers.put(WaterType.CANAL, new CanalHandler());
+        this.handlers.put(WaterType.CREEK, new CreekHandler());
         this.handlers.put(WaterType.DITCH, new DitchHandler());
+        this.handlers.put(WaterType.HARBOUR, new HarbourHandler());
+        this.handlers.put(WaterType.LAGOON, new LagoonHandler());
+        this.handlers.put(WaterType.LAKE, new LakeHandler());
         this.handlers.put(WaterType.POND, new PondHandler());
         this.handlers.put(WaterType.POOL, new PoolHandler());
-        this.handlers.put(WaterType.CREEK, new CreekHandler());
-        this.handlers.put(WaterType.LAGOON, new LagoonHandler());
+        this.handlers.put(WaterType.RESERVOIR, new ReservoirHandler());
+        this.handlers.put(WaterType.RIVER, new RiverHandler());
         this.handlers.put(WaterType.WETLAND, new WetlandHandler());
     }
 
