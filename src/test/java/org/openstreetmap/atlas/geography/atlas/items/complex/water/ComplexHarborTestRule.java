@@ -14,6 +14,7 @@ public class ComplexHarborTestRule extends CoreTestRule
     @TestAtlas(loadFromTextResource = "harborAsRelation.atlas.txt.gz")
     private Atlas harborAsRelationAtlas;
 
+    @TestAtlas(loadFromTextResource = "harborAsArea.atlas.txt.gz")
     private Atlas harborAsAreaAtlas;
 
     public Atlas getHarborAsAreaAtlas()

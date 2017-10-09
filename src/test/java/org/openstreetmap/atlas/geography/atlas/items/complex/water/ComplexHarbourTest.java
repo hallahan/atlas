@@ -12,7 +12,7 @@ import org.openstreetmap.atlas.geography.atlas.items.complex.waters.WaterType;
 import com.google.common.collect.Iterables;
 
 /**
- * Tests {@link ComplexWaterEntity} of {@link WaterType#HARBOUR} creation.
+ * Tests {@link ComplexWaterEntity} of type {@link WaterType#HARBOUR} creation.
  *
  * @author mgostintsev
  */
@@ -24,7 +24,17 @@ public class ComplexHarbourTest
     @Test
     public void testHarbourFromArea()
     {
-        // TODO
+        final Atlas harborAsArea = this.rule.getHarborAsAreaAtlas();
+        final Iterable<ComplexWaterEntity> waterEntities = new ComplexWaterEntityFinder()
+                .find(harborAsArea, Finder::ignore);
+
+        for (final ComplexWaterEntity entity : waterEntities)
+        {
+            System.out.println(entity.toString());
+        }
+        // TODO - should only be one
+        Assert.assertTrue(Iterables.size(waterEntities) == 2);
+        Assert.assertTrue(waterEntities.iterator().next().getWaterType().equals(WaterType.HARBOUR));
     }
 
     @Test
