@@ -27,7 +27,8 @@ public class ComplexHarbourTest
         final Atlas harborAsArea = this.rule.getHarborAsAreaAtlas();
         final Iterable<ComplexWaterEntity> waterEntities = new ComplexWaterEntityFinder()
                 .find(harborAsArea, Finder::ignore);
-        Assert.assertTrue(Iterables.size(waterEntities) == 1);
+        Assert.assertEquals("A single harbor must be created for the Harbor Area in the Atlas.",
+                harborAsArea.numberOfAreas(), Iterables.size(waterEntities));
         Assert.assertTrue(waterEntities.iterator().next().getWaterType().equals(WaterType.HARBOUR));
     }
 
@@ -37,7 +38,8 @@ public class ComplexHarbourTest
         final Atlas harborAsRelation = this.rule.getHarborAsRelationAtlas();
         final Iterable<ComplexWaterEntity> waterEntities = new ComplexWaterEntityFinder()
                 .find(harborAsRelation, Finder::ignore);
-        Assert.assertTrue(Iterables.size(waterEntities) == 1);
+        Assert.assertEquals("A single harbor must be created for the Harbor Relation in the Atlas.",
+                harborAsRelation.numberOfRelations(), Iterables.size(waterEntities));
         Assert.assertTrue(waterEntities.iterator().next().getWaterType().equals(WaterType.HARBOUR));
     }
 }
