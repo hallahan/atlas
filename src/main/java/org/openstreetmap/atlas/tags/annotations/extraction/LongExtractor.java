@@ -1,5 +1,6 @@
 package org.openstreetmap.atlas.tags.annotations.extraction;
 
+import java.io.Serializable;
 import java.util.Optional;
 
 import org.openstreetmap.atlas.tags.annotations.Tag;
@@ -11,8 +12,10 @@ import org.openstreetmap.atlas.tags.annotations.validation.LongValidator;
  *
  * @author mgostintsev
  */
-public class LongExtractor implements TagExtractor<Long>
+public class LongExtractor implements TagExtractor<Long>, Serializable
 {
+    private static final long serialVersionUID = -434657580531093809L;
+
     @Override
     public Optional<Long> validateAndExtract(final String value, final Tag tag)
     {
