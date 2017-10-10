@@ -49,7 +49,7 @@ public class Tagger<T extends Enum<T>> implements Serializable
                 {
                     if (!this.storedTags.containsKey(tagValue))
                     {
-                        final Optional<T> tag = Validators.from(this.type, taggable);
+                        final Optional<T> tag = Validators.fromAnnotation(this.type, taggable);
                         this.storedTags.put(tagValue.get(), tag);
                     }
                 }

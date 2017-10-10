@@ -1,6 +1,8 @@
 buildscript {
     dependencies {
         classpath 'com.diffplug.spotless:spotless-plugin-gradle:3.4.0'
+        // Rio Addon
+        classpath 'com.apple.cie.rio:gradle-build-plugin:latest.release'
     }
 }
 
@@ -19,6 +21,9 @@ apply plugin: 'maven'
 apply plugin: 'signing'
 apply plugin: "com.diffplug.gradle.spotless"
 apply plugin: 'idea'
+
+// Rio addons
+apply plugin: 'rio-library'
 
 sourceCompatibility=1.8
 targetCompatibility=1.8
@@ -116,7 +121,7 @@ dependencies
     compile packages.jsonassert
     compile packages.jackson.core
     compile packages.jackson.databind
-    
+
     shaded project.configurations.getByName('compile')
     shaded packages.slf4j.log4j12
     shaded packages.log4j
@@ -159,20 +164,20 @@ tasks.withType(Test) {
 /**
  * Artifact related items
  */
-task javadocJar(type: Jar) {
-    classifier = 'javadoc'
-    from javadoc
-}
-
-task sourcesJar(type: Jar) {
-    classifier = 'sources'
-    from sourceSets.main.allSource
-}
-
-artifacts
-{
-    archives javadocJar, sourcesJar
-}
+// task javadocJar(type: Jar) {
+//     classifier = 'javadoc'
+//     from javadoc
+// }
+//
+// task sourcesJar(type: Jar) {
+//     classifier = 'sources'
+//     from sourceSets.main.allSource
+// }
+//
+// artifacts
+// {
+//     archives javadocJar, sourcesJar
+// }
 
 /**
  * Deployment related items
@@ -246,6 +251,22 @@ uploadArchives
                     }
                 }
             }
+        }
+    }
+}
+
+rio
+{
+    library
+    { isPublic = true }
+}
+
+publishing.publications {
+    rioLibrary(MavenPublication) {
+        groupId project.group
+        artifactId project.name
+        artifact shaded {
+            classifier "shaded"
         }
     }
 }
