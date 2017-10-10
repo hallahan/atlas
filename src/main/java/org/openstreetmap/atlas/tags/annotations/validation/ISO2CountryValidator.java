@@ -1,5 +1,6 @@
 package org.openstreetmap.atlas.tags.annotations.validation;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.Set;
@@ -13,8 +14,10 @@ import org.apache.commons.lang3.StringUtils;
  *
  * @author cstaylor
  */
-public class ISO2CountryValidator implements TagValidator
+public class ISO2CountryValidator implements TagValidator, Serializable
 {
+    private static final long serialVersionUID = 1751487440877056383L;
+
     private static Set<String> validISOCountries;
 
     static

@@ -8,6 +8,8 @@ package org.openstreetmap.atlas.tags.annotations.validation;
  */
 public class DoubleValidator extends NumericValidator
 {
+    private static final long serialVersionUID = -5016900921350800370L;
+
     @Override
     protected Number parse(final String value)
     {

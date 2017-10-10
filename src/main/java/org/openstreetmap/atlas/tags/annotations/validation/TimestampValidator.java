@@ -9,6 +9,8 @@ import java.util.Date;
  */
 public class TimestampValidator extends ExactMatchValidator
 {
+    private static final long serialVersionUID = 3331538609466408457L;
+
     @Override
     public boolean isValid(final String value)
     {
