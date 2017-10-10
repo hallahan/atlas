@@ -27,6 +27,8 @@ public class HarbourHandler extends AbstractWaterHandler
 
     public static boolean isHarbour(final AtlasEntity entity)
     {
+        // Excluding industrial landuse, ports and shipyards, as those are often used to tag
+        // non-water geometry.
         return Validators.isOfType(entity, HarbourTag.class, HarbourTag.YES)
                 && !Validators.isOfType(entity, LandUseTag.class, LandUseTag.INDUSTRIAL,
                         LandUseTag.PORT)
