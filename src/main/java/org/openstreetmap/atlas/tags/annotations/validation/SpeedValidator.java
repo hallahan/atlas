@@ -1,5 +1,7 @@
 package org.openstreetmap.atlas.tags.annotations.validation;
 
+import java.io.Serializable;
+
 import org.openstreetmap.atlas.utilities.scalars.Speed;
 
 /**
@@ -12,8 +14,10 @@ import org.openstreetmap.atlas.utilities.scalars.Speed;
  *
  * @author mgostintsev
  */
-public class SpeedValidator implements TagValidator
+public class SpeedValidator implements TagValidator, Serializable
 {
+    private static final long serialVersionUID = -4334583747429085244L;
+
     private static final DoubleValidator DOUBLE_VALIDATOR;
 
     static
