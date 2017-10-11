@@ -11,10 +11,10 @@ import org.openstreetmap.atlas.utilities.testing.TestAtlas;
  */
 public class ComplexHarborTestRule extends CoreTestRule
 {
-    @TestAtlas(loadFromTextResource = "harborAsRelation.atlas.txt.gz")
+    @TestAtlas(loadFromTextResource = "harborAsRelation.atlas.txt")
     private Atlas harborAsRelationAtlas;
 
-    @TestAtlas(loadFromTextResource = "harborAsArea.atlas.txt.gz")
+    @TestAtlas(loadFromTextResource = "harborAsArea.atlas.txt")
     private Atlas harborAsAreaAtlas;
 
     public Atlas getHarborAsAreaAtlas()

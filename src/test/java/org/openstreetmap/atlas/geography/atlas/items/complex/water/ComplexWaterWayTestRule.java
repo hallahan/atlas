@@ -11,10 +11,10 @@ import org.openstreetmap.atlas.utilities.testing.TestAtlas;
  */
 public class ComplexWaterWayTestRule extends CoreTestRule
 {
-    @TestAtlas(loadFromTextResource = "canalAsRelationOfCanals.atlas.txt.gz")
+    @TestAtlas(loadFromTextResource = "canalAsRelationOfCanals.atlas.txt")
     private Atlas canalAsRelationOfCanalEntitiesAtlas;
 
-    @TestAtlas(loadFromTextResource = "canalAsRelation.atlas.txt.gz")
+    @TestAtlas(loadFromTextResource = "canalAsRelation.atlas.txt")
     private Atlas canalAsRelationOfNonCanalEntitiesAtlas;
 
     public Atlas getCanalAsRelationOfCanalEntitiesAtlas()
