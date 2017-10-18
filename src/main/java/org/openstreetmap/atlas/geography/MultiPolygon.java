@@ -91,13 +91,13 @@ public class MultiPolygon implements Iterable<Polygon>, Located, Serializable
         {
             final Map<String, String> tags = new HashMap<>();
             tags.put("MultiPolygon", "outer");
-            return new LocationIterableProperties(polygon, new HashMap<>());
+            return new LocationIterableProperties(polygon, tags);
         });
         final Iterable<LocationIterableProperties> inners = Iterables.translate(inners(), polygon ->
         {
             final Map<String, String> tags = new HashMap<>();
             tags.put("MultiPolygon", "inner");
-            return new LocationIterableProperties(polygon, new HashMap<>());
+            return new LocationIterableProperties(polygon, tags);
         });
         return new MultiIterable<>(outers, inners);
     }
