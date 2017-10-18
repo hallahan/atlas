@@ -2,11 +2,14 @@ package org.openstreetmap.atlas.geography;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.openstreetmap.atlas.exception.CoreException;
 import org.openstreetmap.atlas.geography.converters.WktMultiPolyLineConverter;
+import org.openstreetmap.atlas.geography.geojson.GeoJsonBuilder;
 import org.openstreetmap.atlas.utilities.collections.Iterables;
 
 import com.google.common.collect.Lists;
@@ -63,5 +66,13 @@ public class MultiPolyLine implements Iterable<PolyLine>, Located, Serializable
         final List<Location> locations = Lists.newArrayList();
         this.polyLineList.stream().map(PolyLine::getPoints).forEach(locations::addAll);
         return Rectangle.forLocations(locations);
+    }
+
+    public Iterable<GeoJsonBuilder.LocationIterableProperties> asLocationIterableProperties()
+    {
+        return polyLineList.stream()
+                .map(polyLine -> new GeoJsonBuilder.LocationIterableProperties(polyLine,
+                        new HashMap<>()))
+                .collect(Collectors.toList());
     }
 }
