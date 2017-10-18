@@ -1,5 +1,6 @@
 package org.openstreetmap.atlas.tags.annotations.extraction;
 
+import java.io.Serializable;
 import java.util.Optional;
 
 import org.openstreetmap.atlas.tags.annotations.validation.NonEmptyStringValidator;
@@ -9,8 +10,10 @@ import org.openstreetmap.atlas.tags.annotations.validation.NonEmptyStringValidat
  *
  * @author mgostintsev
  */
-public final class NonEmptyStringExtractor
+public final class NonEmptyStringExtractor implements Serializable
 {
+    private static final long serialVersionUID = 4351273829548549527L;
+
     private static final NonEmptyStringValidator VALIDATOR = new NonEmptyStringValidator();
 
     public static Optional<String> validateAndExtract(final String value)

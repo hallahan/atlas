@@ -1,5 +1,6 @@
 package org.openstreetmap.atlas.tags.annotations.extraction;
 
+import java.io.Serializable;
 import java.util.Optional;
 
 import org.openstreetmap.atlas.tags.annotations.Tag;
@@ -11,8 +12,10 @@ import org.openstreetmap.atlas.tags.annotations.validation.OrdinalValidator;
  *
  * @author mgostintsev
  */
-public final class OrdinalExtractor implements TagExtractor<Integer>
+public final class OrdinalExtractor implements TagExtractor<Integer>, Serializable
 {
+    private static final long serialVersionUID = 2382536179497103504L;
+
     @Override
     public Optional<Integer> validateAndExtract(final String value, final Tag tag)
     {
