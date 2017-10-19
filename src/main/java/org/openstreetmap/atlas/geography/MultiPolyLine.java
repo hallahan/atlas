@@ -21,6 +21,7 @@ import com.google.common.collect.Lists;
  */
 public class MultiPolyLine implements Iterable<PolyLine>, Located, Serializable
 {
+    private static final long serialVersionUID = 5907807607388840698L;
     private final List<PolyLine> polyLineList;
 
     public MultiPolyLine(final Iterable<? extends PolyLine> polyLines)
