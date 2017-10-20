@@ -21,9 +21,10 @@ public class CountryToShardListingTest
         final CountryToShardListing listing = new CountryToShardListing();
         final StringList countries = new StringList();
         countries.add("ZAF");
-        final CountryBoundaryMap boundaries = new CountryBoundaryMap(new InputStreamResource(
-                CountryToShardListingTest.class.getResourceAsStream("ZAF_osm_boundary.txt.gz"))
-                        .withDecompressor(Decompressor.GZIP));
+        final CountryBoundaryMap boundaries = new CountryBoundaryMap(
+                new InputStreamResource(() -> CountryToShardListingTest.class
+                        .getResourceAsStream("ZAF_osm_boundary.txt.gz"))
+                                .withDecompressor(Decompressor.GZIP));
         final Sharding sharding = Sharding.forString("dynamic@"
                 + CountryToShardListingTest.class.getResource("tree-6-14-100000.txt.gz").getPath());
         final StringResource output = new StringResource();
