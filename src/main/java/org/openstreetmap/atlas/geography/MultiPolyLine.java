@@ -71,7 +71,7 @@ public class MultiPolyLine implements Iterable<PolyLine>, Located, Serializable
 
     public Iterable<GeoJsonBuilder.LocationIterableProperties> asLocationIterableProperties()
     {
-        return polyLineList.stream()
+        return this.polyLineList.stream()
                 .map(polyLine -> new GeoJsonBuilder.LocationIterableProperties(polyLine,
                         new HashMap<>()))
                 .collect(Collectors.toList());

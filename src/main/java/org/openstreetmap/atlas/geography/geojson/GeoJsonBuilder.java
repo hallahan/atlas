@@ -166,7 +166,7 @@ public class GeoJsonBuilder
     }
 
     /**
-     * Creates a GeoJson FeatureCollection from a iterable of GeoJsonObject
+     * Creates a GeoJson FeatureCollection from an iterable of GeoJsonObject
      *
      * @param geoJsonObjects
      *            a iterable of GeoJsonObject
