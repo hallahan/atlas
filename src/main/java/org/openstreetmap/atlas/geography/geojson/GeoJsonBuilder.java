@@ -166,6 +166,31 @@ public class GeoJsonBuilder
     }
 
     /**
+     * Creates a GeoJson FeatureCollection from an iterable of GeoJsonObject
+     *
+     * @param geoJsonObjects
+     *            a iterable of GeoJsonObject
+     * @return a GeoJson FeatureCollection
+     */
+    public GeoJsonObject createFromGeoJson(final Iterable<GeoJsonObject> geoJsonObjects)
+    {
+        final JsonObject result = new JsonObject();
+        result.addProperty(TYPE, FEATURE_COLLECTION);
+        final JsonArray features = new JsonArray();
+        int counter = 0;
+        for (final GeoJsonObject object : geoJsonObjects)
+        {
+            if (this.logFrequency > 0 && ++counter % this.logFrequency == 0)
+            {
+                logger.info("Processed {} features.", counter);
+            }
+            features.add(object.jsonObject());
+        }
+        result.add(FEATURES, features);
+        return new GeoJsonObject(result);
+    }
+
+    /**
      * Creates a Point type GeoJson Feature
      *
      * @param location
