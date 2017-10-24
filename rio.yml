@@ -20,8 +20,9 @@ builds:
 
 # apple-release
   - branchName: apple
+    name: master-release
     build:
-      template: buildozer:v1:publish
+      template: gradle:v3:app:release
     trigger:
       gitPush: false
     publish:
@@ -34,8 +35,9 @@ builds:
 
 # build master to a release, when needed
   - branchName: release
+    name: release-release
     build:
-      template: buildozer:v1:publish
+      template: gradle:v3:app:release
     trigger:
       gitPush: false
     publish:
