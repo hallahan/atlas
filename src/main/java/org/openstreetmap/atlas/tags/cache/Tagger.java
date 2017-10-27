@@ -67,5 +67,4 @@ public class Tagger<T extends Enum<T>> implements Serializable
         }
         return Optional.empty();
     }
-
 }
