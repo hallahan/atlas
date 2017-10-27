@@ -43,7 +43,7 @@ public class Tagger<T extends Enum<T>> implements Serializable
         if (possibleTagValue.isPresent())
         {
             final String tagValue = possibleTagValue.get();
-            Optional<T> value = this.storedTags.get(tagValue);
+            final Optional<T> value = this.storedTags.get(tagValue);
             if (value == null)
             {
                 synchronized (this)
@@ -52,18 +52,12 @@ public class Tagger<T extends Enum<T>> implements Serializable
                     // the tag value stored in the map
                     if (!this.storedTags.containsKey(tagValue))
                     {
-                        value = Validators.fromAnnotation(this.type, taggable);
-                        this.storedTags.put(tagValue, value);
-                    }
-                    // if hash map contains the key that means value is null so return empty
-                    // optional instead of null to avoid NullPointerException
-                    else
-                    {
-                        value = Optional.empty();
+                        final Optional<T> tag = Validators.fromAnnotation(this.type, taggable);
+                        this.storedTags.put(tagValue, tag);
                     }
                 }
             }
-            return value;
+            return this.storedTags.get(tagValue);
         }
         return Optional.empty();
     }
