@@ -1,9 +1,9 @@
 package org.openstreetmap.atlas.tags.cache;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import org.openstreetmap.atlas.tags.Taggable;
 import org.openstreetmap.atlas.tags.annotations.validation.Validators;
@@ -24,7 +24,7 @@ public class Tagger<T extends Enum<T>> implements Serializable
     private final Class<T> type;
     private final String tagName;
 
-    private final Map<String, Optional<T>> storedTags;
+    private final ConcurrentMap<String, Optional<T>> storedTags;
 
     public Tagger(final Class<T> type)
     {
@@ -34,7 +34,8 @@ public class Tagger<T extends Enum<T>> implements Serializable
 
         this.type = type;
         this.tagName = Validators.findTagNameIn(type);
-        this.storedTags = new HashMap<>();
+        // Using concurrent hashmap to avoid concurrency issues while reading and writing
+        this.storedTags = new ConcurrentHashMap<>();
     }
 
     public Optional<T> getTag(final Taggable taggable)
@@ -43,20 +44,10 @@ public class Tagger<T extends Enum<T>> implements Serializable
         if (possibleTagValue.isPresent())
         {
             final String tagValue = possibleTagValue.get();
-            final Optional<T> value = this.storedTags.get(tagValue);
-            if (value == null)
-            {
-                synchronized (this)
-                {
-                    // if hash map doesn't contain the key then add the key value pair and return
-                    // the tag value stored in the map
-                    if (!this.storedTags.containsKey(tagValue))
-                    {
-                        final Optional<T> tag = Validators.fromAnnotation(this.type, taggable);
-                        this.storedTags.put(tagValue, tag);
-                    }
-                }
-            }
+            final Optional<T> tag = Validators.fromAnnotation(this.type, taggable);
+            // this will make sure that key value pair is added only if key is not present or
+            // the initial value is null
+            this.storedTags.putIfAbsent(tagValue, tag);
             return this.storedTags.get(tagValue);
         }
         return Optional.empty();
