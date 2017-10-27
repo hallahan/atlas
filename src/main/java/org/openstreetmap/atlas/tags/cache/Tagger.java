@@ -13,6 +13,7 @@ import org.openstreetmap.atlas.tags.annotations.validation.Validators;
  * would save time to cache associations between tag names and their representative Enum values.
  *
  * @author gpogulsky
+ * @author sbhalekar
  * @param <T>
  *            - type of tag Enum class
  */
@@ -38,26 +39,32 @@ public class Tagger<T extends Enum<T>> implements Serializable
 
     public Optional<T> getTag(final Taggable taggable)
     {
-        final Optional<String> tagValue = taggable.getTag(this.tagName);
-
-        if (tagValue.isPresent())
+        final Optional<String> possibleTagValue = taggable.getTag(this.tagName);
+        if (possibleTagValue.isPresent())
         {
-            final Optional<T> value = this.storedTags.get(tagValue.get());
+            final String tagValue = possibleTagValue.get();
+            Optional<T> value = this.storedTags.get(tagValue);
             if (value == null)
             {
                 synchronized (this)
                 {
+                    // if hash map doesn't contain the key then add the key value pair and return
+                    // the tag value stored in the map
                     if (!this.storedTags.containsKey(tagValue))
                     {
-                        final Optional<T> tag = Validators.fromAnnotation(this.type, taggable);
-                        this.storedTags.put(tagValue.get(), tag);
+                        value = Validators.fromAnnotation(this.type, taggable);
+                        this.storedTags.put(tagValue, value);
+                    }
+                    // if hash map contains the key that means value is null so return empty
+                    // optional instead of null to avoid NullPointerException
+                    else
+                    {
+                        value = Optional.empty();
                     }
                 }
             }
-
-            return this.storedTags.get(tagValue.get());
+            return value;
         }
-
         return Optional.empty();
     }
 
