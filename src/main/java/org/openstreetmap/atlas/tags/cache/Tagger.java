@@ -2,11 +2,15 @@ package org.openstreetmap.atlas.tags.cache;
 
 import java.io.Serializable;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ExecutionException;
 
 import org.openstreetmap.atlas.tags.Taggable;
 import org.openstreetmap.atlas.tags.annotations.validation.Validators;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 
 /**
  * Cache for Tags of certain type. For applications that check tags on big numbers of objects, it
@@ -20,11 +24,11 @@ import org.openstreetmap.atlas.tags.annotations.validation.Validators;
 public class Tagger<T extends Enum<T>> implements Serializable
 {
     private static final long serialVersionUID = -9170158494924659179L;
+    private static Logger logger = LoggerFactory.getLogger(Tagger.class);
 
     private final Class<T> type;
     private final String tagName;
-
-    private final ConcurrentMap<String, Optional<T>> storedTags;
+    private final Cache<String, Optional<T>> cache;
 
     public Tagger(final Class<T> type)
     {
@@ -34,8 +38,7 @@ public class Tagger<T extends Enum<T>> implements Serializable
 
         this.type = type;
         this.tagName = Validators.findTagNameIn(type);
-        // Using concurrent hashmap to avoid concurrency issues while reading and writing
-        this.storedTags = new ConcurrentHashMap<>();
+        this.cache = CacheBuilder.newBuilder().build();
     }
 
     public Optional<T> getTag(final Taggable taggable)
@@ -44,11 +47,22 @@ public class Tagger<T extends Enum<T>> implements Serializable
         if (possibleTagValue.isPresent())
         {
             final String tagValue = possibleTagValue.get();
-            final Optional<T> tag = Validators.fromAnnotation(this.type, taggable);
-            // this will make sure that key value pair is added only if key is not present or
-            // the initial value is null
-            this.storedTags.putIfAbsent(tagValue, tag);
-            return this.storedTags.get(tagValue);
+            try
+            {
+                // Referenced from
+                // https://github.com/google/guava/wiki/CachesExplained#from-a-callable
+                // If tagValue is present in the cache then return the value; otherwise execute
+                // function add the value to cache and return it
+                return this.cache.get(tagValue,
+                        () -> Validators.fromAnnotation(Tagger.this.type, taggable));
+            }
+            // this exception is thrown by the Callable in the get method of the cache. Ideally
+            // we should never hit this exception
+            catch (final ExecutionException e)
+            {
+                logger.warn(e.getMessage());
+                return Optional.empty();
+            }
         }
         return Optional.empty();
     }
