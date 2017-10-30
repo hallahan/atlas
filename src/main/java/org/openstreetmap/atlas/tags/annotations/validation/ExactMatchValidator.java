@@ -1,5 +1,6 @@
 package org.openstreetmap.atlas.tags.annotations.validation;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -11,8 +12,10 @@ import java.util.stream.Collectors;
  *
  * @author cstaylor
  */
-public class ExactMatchValidator implements TagValidator
+public class ExactMatchValidator implements TagValidator, Serializable
 {
+    private static final long serialVersionUID = -7413339451903292561L;
+
     private final Set<String> values;
     private final Set<Pattern> regexes;
 

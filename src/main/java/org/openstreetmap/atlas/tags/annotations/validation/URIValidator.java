@@ -10,6 +10,8 @@ import java.net.URISyntaxException;
  */
 public class URIValidator extends ExactMatchValidator
 {
+    private static final long serialVersionUID = 2733528204999294769L;
+
     @Override
     public boolean isValid(final String value)
     {
