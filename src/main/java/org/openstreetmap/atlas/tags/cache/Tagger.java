@@ -58,7 +58,7 @@ public class Tagger<T extends Enum<T>> implements Serializable
             // we should never hit this exception
             catch (final ExecutionException e)
             {
-                throw new CoreException(e.getMessage());
+                throw new CoreException("Error getting tag value from the cache", e);
             }
         }
         return Optional.empty();
