@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
+import org.openstreetmap.atlas.exception.CoreException;
 import org.openstreetmap.atlas.tags.Taggable;
 import org.openstreetmap.atlas.tags.annotations.validation.Validators;
 import org.slf4j.Logger;
@@ -60,8 +61,7 @@ public class Tagger<T extends Enum<T>> implements Serializable
             // we should never hit this exception
             catch (final ExecutionException e)
             {
-                logger.warn(e.getMessage());
-                return Optional.empty();
+                throw new CoreException(e.getMessage());
             }
         }
         return Optional.empty();
