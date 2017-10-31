@@ -7,8 +7,6 @@ import java.util.concurrent.ExecutionException;
 import org.openstreetmap.atlas.exception.CoreException;
 import org.openstreetmap.atlas.tags.Taggable;
 import org.openstreetmap.atlas.tags.annotations.validation.Validators;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -25,7 +23,6 @@ import com.google.common.cache.CacheBuilder;
 public class Tagger<T extends Enum<T>> implements Serializable
 {
     private static final long serialVersionUID = -9170158494924659179L;
-    private static Logger logger = LoggerFactory.getLogger(Tagger.class);
 
     private final Class<T> type;
     private final String tagName;
