@@ -112,7 +112,7 @@ public class HttpResultHandler
         }
         catch (final IOException oops)
         {
-            throw new CoreException("Error when parsing spectrum results", oops);
+            throw new CoreException("Error when parsing HTTP response body", oops);
         }
     }
 
