@@ -1,5 +1,6 @@
 package org.openstreetmap.atlas.tags.annotations.extraction;
 
+import java.io.Serializable;
 import java.util.Optional;
 
 import org.openstreetmap.atlas.tags.annotations.validation.SpeedValidator;
@@ -13,8 +14,10 @@ import org.slf4j.LoggerFactory;
  *
  * @author mgostintsev
  */
-public final class SpeedExtractor
+public final class SpeedExtractor implements Serializable
 {
+    private static final long serialVersionUID = -2351982626355316975L;
+
     private static final SpeedValidator VALIDATOR = new SpeedValidator();
     private static final String SINGLE_SPACE = " ";
     private static final Logger logger = LoggerFactory.getLogger(SpeedExtractor.class);

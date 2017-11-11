@@ -11,6 +11,7 @@ import org.openstreetmap.atlas.utilities.collections.StringList;
 
 /**
  * @author matthieun
+ * @author james-gage
  */
 public class CountryToShardListingTest
 {

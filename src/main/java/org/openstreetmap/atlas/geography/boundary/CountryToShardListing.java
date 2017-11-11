@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
  * List all the {@link Shard}s for each country
  *
  * @author matthieun
+ * @author james-gage
  */
 public class CountryToShardListing extends Command
 {

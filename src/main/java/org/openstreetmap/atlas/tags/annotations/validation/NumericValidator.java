@@ -14,6 +14,8 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class NumericValidator extends ExactMatchValidator
 {
+    private static final long serialVersionUID = -9161444492372297016L;
+
     private static final Logger logger = LoggerFactory.getLogger(NumericValidator.class);
 
     private Long minimum;
