@@ -64,8 +64,7 @@ public class CountryToShardListing extends Command
                 final List<CountryBoundary> countryBoundaries = boundaries.countryBoundary(country);
                 if (countryBoundaries != null)
                 {
-                    // for countries split by the Meridian line there will be two
-                    // countryBoundaries
+                    // for countries split by the Meridian line there will be two countryBoundaries
                     for (final CountryBoundary countryBound : countryBoundaries)
                     {
                         final MultiPolygon countryBoundary = countryBound.getBoundary();
