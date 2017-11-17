@@ -167,4 +167,19 @@ public class PolyLineTest
                 multipleLocationPolyLine.toString());
     }
 
+    @Test
+    public void testWithoutDuplicateConsecutiveShapePoints()
+    {
+        final PolyLine polyLine1 = PolyLine.wkt(
+                "LINESTRING (-75.616326 40.194564, -75.616330 40.194570, -75.616330 40.194570, -75.616340 40.194580)");
+        final PolyLine polyLine2 = PolyLine.wkt(
+                "LINESTRING (-75.616326 40.194564, -75.616330 40.194570, -75.616340 40.194580)");
+        final PolyLine polyLine3 = PolyLine.wkt(
+                "LINESTRING (-75.616326 40.194564, -75.616330 40.194570, -75.616340 40.194580, -75.616330 40.194570)");
+        Assert.assertEquals(polyLine2.toWkt(),
+                polyLine1.withoutDuplicateConsecutiveShapePoints().toWkt());
+        Assert.assertEquals(polyLine3.toWkt(),
+                polyLine3.withoutDuplicateConsecutiveShapePoints().toWkt());
+    }
+
 }
