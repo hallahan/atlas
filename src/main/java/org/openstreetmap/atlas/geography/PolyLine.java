@@ -1074,6 +1074,9 @@ public class PolyLine implements Collection<Location>, Located, Serializable
         return new WktPolyLineConverter().convert(this);
     }
 
+    /**
+     * @return This {@link PolyLine} without duplicate consecutive shape points
+     */
     public PolyLine withoutDuplicateConsecutiveShapePoints()
     {
         final List<Location> uniqueConsecutiveShapePoints = new ArrayList<>();
