@@ -1,5 +1,7 @@
 package org.openstreetmap.atlas.tags.annotations.validation;
 
+import java.io.Serializable;
+
 import org.apache.commons.lang3.StringUtils;
 import org.openstreetmap.atlas.geography.atlas.items.complex.buildings.HeightConverter;
 
@@ -12,8 +14,10 @@ import org.openstreetmap.atlas.geography.atlas.items.complex.buildings.HeightCon
  * @author cstaylor
  * @author gpogulsky
  */
-public class LengthValidator implements TagValidator
+public class LengthValidator implements TagValidator, Serializable
 {
+    private static final long serialVersionUID = 2103843192716472287L;
+
     private static final DoubleValidator DOUBLE_VALIDATOR;
     private static final String METERS_SUFFIX = " m";
 

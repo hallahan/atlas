@@ -101,8 +101,7 @@ public class CountrySlicingProcessorTest
         this.store = new PbfMemoryStore(AtlasLoadingOption.createOptionWithNoSlicing());
 
         // Way starts in Liberia and ends in Sierra Leone (outside of given boundary)
-        @SuppressWarnings("unused")
-        final Way way = addWay("7.5,-10.8 7.7,-11.8");
+        addWay("7.5,-10.8 7.7,-11.8");
 
         final MultiPolygon bound = boundaryMap.countryBoundary("CIV").get(0).getBoundary();
         CountrySlicingProcessor processor = new CountrySlicingProcessor(this.store, boundaryMap,

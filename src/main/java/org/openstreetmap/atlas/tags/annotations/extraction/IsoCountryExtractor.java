@@ -1,5 +1,6 @@
 package org.openstreetmap.atlas.tags.annotations.extraction;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -14,8 +15,10 @@ import org.openstreetmap.atlas.utilities.collections.StringList;
  *
  * @author mgostintsev
  */
-public class IsoCountryExtractor implements TagExtractor<List<IsoCountry>>
+public class IsoCountryExtractor implements TagExtractor<List<IsoCountry>>, Serializable
 {
+    private static final long serialVersionUID = -8043043145246416243L;
+
     @Override
     public Optional<List<IsoCountry>> validateAndExtract(final String value, final Tag tag)
     {

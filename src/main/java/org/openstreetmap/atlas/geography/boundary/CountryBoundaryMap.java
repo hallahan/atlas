@@ -980,7 +980,7 @@ public class CountryBoundaryMap implements Serializable
             }
         }
 
-        // Performance: short circuit, if all intersected polygons in same country, skip cutting
+        // Performance: short circuit, if all intersected polygons in same country, skip cutting.
         if (isSameCountry(intersected))
         {
             final String countryCode = getGeometryProperty(intersected.get(0), ISOCountryTag.KEY);
