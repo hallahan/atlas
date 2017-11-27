@@ -128,13 +128,44 @@ public class RouteTest
     }
 
     @Test
+    public void testStartsWith()
+    {
+        final Atlas atlas = this.rule.getAtlas();
+
+        final Route route = Route.forEdges(atlas.edge(159019301), atlas.edge(128620751),
+                atlas.edge(128620796));
+        final Route multiRoute = Route.forEdges(atlas.edge(159019301), atlas.edge(128620751));
+        final Route singleRoute = Route.forEdges(atlas.edge(159019301));
+        final Route incorrectMultiRoute = Route.forEdges(atlas.edge(159019301),
+                atlas.edge(128620751), atlas.edge(138620888));
+        final Route incorrectSingleRoute = Route.forEdge(atlas.edge(128620751));
+
+        // Verify for a multiRoute
+        Assert.assertTrue(route.startsWith(multiRoute));
+        // Verify for a singleRoute
+        Assert.assertTrue(route.startsWith(singleRoute));
+
+        // Verify negative case for a multiRoute
+        Assert.assertFalse(route.startsWith(incorrectMultiRoute));
+        // Verify negative case for a singleRoute
+        Assert.assertFalse(route.startsWith(incorrectSingleRoute));
+
+        // Verify negative case where other route is longer than current route
+        Assert.assertFalse(singleRoute.startsWith(multiRoute));
+    }
+
+    @Test
     public void testSubRoutes()
     {
         final Atlas atlas = this.rule.getAtlas();
         final Route shorterRoute = Route.forEdges(atlas.edge(159019301), atlas.edge(128620751));
         final Route longerRoute = Route.forEdges(atlas.edge(159019301), atlas.edge(128620751),
                 atlas.edge(128620796));
+        final Route partialLongerRoute = Route.forEdges(atlas.edge(128620751),
+                atlas.edge(128620796));
+        final Route middleEdgeRoute = Route.forEdge(atlas.edge(128620751));
 
+        // SubRouteIndex and isSubRoute tests
         Assert.assertEquals("Longer route cannot be a subroute of the a shorter one", -1,
                 shorterRoute.subRouteIndex(longerRoute));
         Assert.assertFalse(shorterRoute.isSubRoute(longerRoute));
@@ -143,5 +174,18 @@ public class RouteTest
                 "Shorter route is a subroute of the longer one, with the last overlap at index 1",
                 1, longerRoute.subRouteIndex(shorterRoute));
         Assert.assertTrue(longerRoute.isSubRoute(shorterRoute));
+
+        // subRoute tests
+        // subroute the last edge of longer route - this should result in a route identical to
+        // shorterRoute
+        Assert.assertEquals(shorterRoute, longerRoute.subRoute(0, shorterRoute.size()));
+
+        // subRoute the first edge of longer route - this should result in a route identical to
+        // partialLongerRoute
+        Assert.assertEquals(partialLongerRoute, longerRoute.subRoute(1, longerRoute.size()));
+
+        // subRoute the middle edge of the longer route - this should result in a route identical to
+        // middleEdgeRoute
+        Assert.assertEquals(middleEdgeRoute, longerRoute.subRoute(1, 2));
     }
 }
