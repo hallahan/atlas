@@ -139,7 +139,7 @@ public final class TurnRestriction implements Located, Serializable
                                  */
 
                                 // First make sure the from route is found within the candidate
-                                // route and make sure the mandated path is not a
+                                // route and make sure the specified path is not a
                                 // subRoute of the candidate route
                                 if (candidate.isSubRoute(from) && !candidate.isSubRoute(path))
                                 {
@@ -149,7 +149,7 @@ public final class TurnRestriction implements Located, Serializable
                                     if (fromSubRouteIndex == routeEndIndex)
                                     {
                                         // If the from edge is the last edge in the route, the route
-                                        // should not be restricted as the mandate hasn't been
+                                        // should not be restricted as the only directive isn't
                                         // broken, so continue searching.
                                         continue;
                                     }
@@ -167,12 +167,11 @@ public final class TurnRestriction implements Located, Serializable
                                             .subRoute(fromSubRouteIndex + 1, routeEndIndex + 1);
 
                                     if (turnRestriction.otherToOptions().stream()
-                                            .anyMatch(route -> partialRoute.startsWith(route)))
+                                            .anyMatch(partialRoute::startsWith))
                                     {
                                         // If the partial route starts with any other to options,
-                                        // the
-                                        // mandate has not been followed and this path should be
-                                        // restricted
+                                        // the only directive has not been followed and this path
+                                        // should be restricted
                                         return true;
                                     }
                                 }

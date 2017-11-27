@@ -852,11 +852,10 @@ public abstract class Route implements Iterable<Edge>, Located, Serializable
      */
     public Route subRoute(final int startIndex, final int endIndex)
     {
-        final List<Edge> routeList = Iterables.asList(this);
-
         // Create a new ArrayList for safety reasons because subList returns a list backed by the
         // original list.
-        return Route.forEdges(new ArrayList<Edge>(routeList.subList(startIndex, endIndex)));
+        return Route.forEdges(
+                new ArrayList<Edge>(Iterables.asList(this).subList(startIndex, endIndex)));
     }
 
     /**
