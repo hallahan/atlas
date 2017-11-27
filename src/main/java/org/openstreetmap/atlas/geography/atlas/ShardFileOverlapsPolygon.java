@@ -15,10 +15,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Predicate that uses a sharding tree to determine whether a given atlas shard file is within a
- * given Polygon. It depends on shard files following the naming convention of [name]_[zoom]-[x]-
- * [y].atlas.gz. The .atlas and .gz extensions are both optional. For example,
- * DNK_9-272-162.atlas.gz, DNK_9-272-162.atlas, and DNK_9-272-162 all pass the predicate.
+ * Predicate that uses a sharding tree to determine whether a given atlas shard file overlaps a
+ * given Polygon. By default it depends on shard files following the naming convention of
+ * [name]_[zoom]-[x]-[y].atlas.gz, where the .gz extension is optional. For example,
+ * DNK_9-272-162.atlas.gz and DNK_9-272-162.atlas are valid name formats. The shard filename pattern
+ * can be overridden to work with other naming conventions as long as the [zoom]-[x]-[y] portion of
+ * the name still exists as the first group in the pattern.
  *
  * @author rmegraw
  */
@@ -27,15 +29,38 @@ public class ShardFileOverlapsPolygon implements Predicate<Resource>
     private static final Logger logger = LoggerFactory.getLogger(ShardFileOverlapsPolygon.class);
 
     /**
-     * Matches shard filenames such as DNK_9-272-162.atlas.gz, DNK_9-272-162.atlas, DNK_9-272-162
+     * Matches shard filenames such as DNK_9-272-162.atlas.gz and DNK_9-272-162.atlas
      */
-    private static final Pattern shardBaseFilenamePattern = Pattern
-            .compile("^.+_(\\d{1,2}-\\d+-\\d+)(\\.atlas)?(\\.gz)?$");
+    public static final String DEFAULT_SHARD_FILE_REGEX = "^.+_(\\d{1,2}-\\d+-\\d+)\\.atlas(\\.gz)?$";
+
+    private final Pattern shardFilePattern;
 
     private final Set<String> shardsOverlappingPolygon;
 
+    /**
+     * @param shardingTree
+     *            Sharding tree
+     * @param bounds
+     *            Polygon over which shard file overlap is tested
+     */
     public ShardFileOverlapsPolygon(final DynamicTileSharding shardingTree, final Polygon bounds)
     {
+        this(shardingTree, bounds, DEFAULT_SHARD_FILE_REGEX);
+    }
+
+    /**
+     * @param shardingTree
+     *            Sharding tree
+     * @param bounds
+     *            Polygon over which shard file overlap is tested
+     * @param shardFileRegex
+     *            Regex which must extract [zoom]-[x]-[y] portion of shard filename as the first
+     *            group (see default regex for example)
+     */
+    public ShardFileOverlapsPolygon(final DynamicTileSharding shardingTree, final Polygon bounds,
+            final String shardFileRegex)
+    {
+        this.shardFilePattern = Pattern.compile(shardFileRegex);
         this.shardsOverlappingPolygon = new HashSet<>();
         shardingTree.shards(bounds)
                 .forEach(shard -> this.shardsOverlappingPolygon.add(shard.getName()));
@@ -49,7 +74,7 @@ public class ShardFileOverlapsPolygon implements Predicate<Resource>
         if (resource instanceof File)
         {
             final String filename = FilenameUtils.getName(((File) resource).getFile().getName());
-            final Matcher matcher = shardBaseFilenamePattern.matcher(filename);
+            final Matcher matcher = this.shardFilePattern.matcher(filename);
             if (matcher.find())
             {
                 final String shardName = matcher.group(1);

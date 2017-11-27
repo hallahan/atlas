@@ -19,8 +19,11 @@ import org.openstreetmap.atlas.streaming.resource.StringResource;
  */
 public class ShardFileOverlapsPolygonTest
 {
-    private static final DynamicTileSharding SHARDING_TREE = new DynamicTileSharding(new File(
-            ShardFileOverlapsPolygonTest.class.getResource("tree-6-14-100000.txt").getFile()));
+    private static final DynamicTileSharding SHARDING_TREE = new DynamicTileSharding(
+            new File(ShardFileOverlapsPolygonTest.class
+                    .getResource(
+                            "/org/openstreetmap/atlas/geography/boundary/tree-6-14-100000.txt.gz")
+                    .getFile()));
 
     private static final Polygon POLYGON = Rectangle.forCorners(
             Location.forString("55.5868837,12.3541246"), Location.forString("55.752623,12.71942"));
@@ -29,11 +32,22 @@ public class ShardFileOverlapsPolygonTest
             POLYGON);
 
     @Test
-    public void testFilenameFormat()
+    public void testBadRegex()
     {
         // variations on valid filename
+        final Predicate<Resource> myPredicate = new ShardFileOverlapsPolygon(SHARDING_TREE, POLYGON,
+                "^.+_\\d{1,2}-\\d+-\\d+(\\.atlas)?(\\.gz)?$");
+        Assert.assertFalse(myPredicate.test(new File("/some/path/DNK_11-1095-641.atlas.gz")));
+        Assert.assertFalse(myPredicate.test(new File("/some/path/DNK_11-1095-641.atlas")));
+        Assert.assertFalse(myPredicate.test(new File("/some/path/DNK_11-1095-641.gz")));
+        Assert.assertFalse(myPredicate.test(new File("/some/path/DNK_11-1095-641")));
+    }
+
+    @Test
+    public void testFilenameFormat()
+    {
+        // no .gz extension should be ok
         Assert.assertTrue(PREDICATE.test(new File("/some/path/DNK_11-1095-641.atlas")));
-        Assert.assertTrue(PREDICATE.test(new File("/some/path/DNK_11-1095-641")));
 
         // some filenames that aren't formatted properly
         Assert.assertFalse(PREDICATE.test(new File("/some/path/DNK_11_1095_641.atlas.gz")));
@@ -44,6 +58,23 @@ public class ShardFileOverlapsPolygonTest
         Assert.assertFalse(PREDICATE.test(new File("/some/path/DNK_11-1095-641.atlas.gzip")));
         Assert.assertFalse(PREDICATE.test(new File("/some/path/foo")));
         Assert.assertFalse(PREDICATE.test(new File("")));
+
+        // these don't match the default regex, but should match with an alternative regex in
+        // another test
+        Assert.assertFalse(PREDICATE.test(new File("/some/path/DNK_11-1095-641.gz")));
+        Assert.assertFalse(PREDICATE.test(new File("/some/path/DNK_11-1095-641")));
+    }
+
+    @Test
+    public void testFilenameVariations()
+    {
+        // variations on valid filename
+        final Predicate<Resource> myPredicate = new ShardFileOverlapsPolygon(SHARDING_TREE, POLYGON,
+                "^.+_(\\d{1,2}-\\d+-\\d+)(\\.atlas)?(\\.gz)?$");
+        Assert.assertTrue(myPredicate.test(new File("/some/path/DNK_11-1095-641.atlas.gz")));
+        Assert.assertTrue(myPredicate.test(new File("/some/path/DNK_11-1095-641.atlas")));
+        Assert.assertTrue(myPredicate.test(new File("/some/path/DNK_11-1095-641.gz")));
+        Assert.assertTrue(myPredicate.test(new File("/some/path/DNK_11-1095-641")));
     }
 
     @Test
