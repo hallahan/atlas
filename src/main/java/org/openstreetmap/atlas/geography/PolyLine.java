@@ -1081,7 +1081,7 @@ public class PolyLine implements Collection<Location>, Located, Serializable
     public PolyLine withoutDuplicateConsecutiveShapePoints()
     {
         final List<Location> shapePoints = new ArrayList<>();
-        final Set<Location> duplicates = new HashSet<>();
+        boolean duplicates = false;
         Location previousLocation = null;
 
         for (int index = 0; index < this.size(); index++)
@@ -1093,12 +1093,12 @@ public class PolyLine implements Collection<Location>, Located, Serializable
             }
             else
             {
-                duplicates.add(currentLocation);
+                duplicates = true;
             }
             previousLocation = currentLocation;
         }
 
-        return duplicates.isEmpty() ? this : new PolyLine(shapePoints);
+        return duplicates == false ? this : new PolyLine(shapePoints);
     }
 
     protected final List<Location> getPoints()
