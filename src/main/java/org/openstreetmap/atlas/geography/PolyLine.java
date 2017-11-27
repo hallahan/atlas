@@ -1097,8 +1097,7 @@ public class PolyLine implements Collection<Location>, Located, Serializable
             }
             previousLocation = currentLocation;
         }
-
-        return duplicates == false ? this : new PolyLine(shapePoints);
+        return duplicates ? new PolyLine(shapePoints) : this;
     }
 
     protected final List<Location> getPoints()
