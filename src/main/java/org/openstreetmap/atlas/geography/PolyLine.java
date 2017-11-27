@@ -1082,11 +1082,16 @@ public class PolyLine implements Collection<Location>, Located, Serializable
     {
         final List<Location> shapePoints = new ArrayList<>();
         boolean hasDuplicates = false;
-        Location previousLocation = null;
 
-        for (int index = 0; index < this.size(); index++)
+        final Iterator<Location> locationIterator = this.iterator();
+        // PolyLines are only valid if at least one point exists, so it is safe to call next() once.
+        Location previousLocation = locationIterator.next();
+        shapePoints.add(previousLocation);
+
+        while (locationIterator.hasNext())
         {
-            final Location currentLocation = this.get(index);
+            final Location currentLocation = locationIterator.next();
+
             if (!currentLocation.equals(previousLocation))
             {
                 shapePoints.add(currentLocation);
