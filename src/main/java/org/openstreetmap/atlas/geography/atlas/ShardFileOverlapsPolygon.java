@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
  * the name still exists as the first group in the pattern.
  * <p>
  * TODO(rmegraw): Possibly refactor this class in the future to get shard name from atlas metadata
- * rather than filename beucase this would be robust to file naming convention changes. As of
+ * rather than filename because this would be robust to file naming convention changes. As of
  * 11/28/2017 there would be a performance hit getting the metadata if the file is gzipped or read
  * over the network. Per christopher_s_taylor: "If the atlas is a non-gzipped local file it will
  * take advantage of the random access nature of ZipFile to read just the serialized Java metadata
