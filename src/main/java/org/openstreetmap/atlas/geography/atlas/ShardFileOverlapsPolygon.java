@@ -18,9 +18,17 @@ import org.slf4j.LoggerFactory;
  * Predicate that uses a sharding tree to determine whether a given atlas shard file overlaps a
  * given Polygon. By default it depends on shard files following the naming convention of
  * [name]_[zoom]-[x]-[y].atlas.gz, where the .gz extension is optional. For example,
- * DNK_9-272-162.atlas.gz and DNK_9-272-162.atlas are valid name formats. The shard filename pattern
+ * XYZ_9-272-162.atlas.gz and XYZ_9-272-162.atlas are valid name formats. The shard filename pattern
  * can be overridden to work with other naming conventions as long as the [zoom]-[x]-[y] portion of
  * the name still exists as the first group in the pattern.
+ * <p>
+ * TODO(rmegraw): Possibly refactor this class in the future to get shard name from atlas metadata
+ * rather than filename beucase this would be robust to file naming convention changes. As of
+ * 11/28/2017 there would be a performance hit getting the metadata if the file is gzipped or read
+ * over the network. Per christopher_s_taylor: "If the atlas is a non-gzipped local file it will
+ * take advantage of the random access nature of ZipFile to read just the serialized Java metadata
+ * object, but if the file is gzipped or being read over the network (say via HDFS) all of the data
+ * in that particular shard will be loaded into memory, whether we need it or not."
  *
  * @author rmegraw
  */
@@ -29,7 +37,7 @@ public class ShardFileOverlapsPolygon implements Predicate<Resource>
     private static final Logger logger = LoggerFactory.getLogger(ShardFileOverlapsPolygon.class);
 
     /**
-     * Matches shard filenames such as DNK_9-272-162.atlas.gz and DNK_9-272-162.atlas
+     * Matches shard filenames such as XYZ_9-272-162.atlas.gz and XYZ_9-272-162.atlas
      */
     public static final String DEFAULT_SHARD_FILE_REGEX = "^.+_(\\d{1,2}-\\d+-\\d+)\\.atlas(\\.gz)?$";
 
