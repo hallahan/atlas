@@ -174,13 +174,13 @@ public class ComplexTurnRestrictionTest
     {
         final int expectedCountOfRestrictedRoutes = 302;
 
-        // There's a only turn restriction (http://www.openstreetmap.org/relation/6643212)
+        // There's an only turn restriction (http://www.openstreetmap.org/relation/6643212)
         // specifying that 447301069000000 must go to 447301070000000. This route has a corner case
         // where an otherToOption (-447301069000000) is found before the from edge. Specifically
         // check to make sure this path is restricted.
         final String expectedRestrictedRoute = "[Route: 447301065000000, -447301070000000, -447301069000000, 447301069000000, 447301074000000, 447301068000000, 338286211000000]";
 
-        final Atlas complexBigNodeAtlas = this.rule.getBigNodeWithManeuverMandatesAtlas();
+        final Atlas complexBigNodeAtlas = this.rule.getBigNodeWithOnlyTurnRestrictionsAtlas();
 
         final List<Route> restrictedRoutes = StreamSupport
                 .stream(new BigNodeFinder().find(complexBigNodeAtlas, Finder::ignore).spliterator(),

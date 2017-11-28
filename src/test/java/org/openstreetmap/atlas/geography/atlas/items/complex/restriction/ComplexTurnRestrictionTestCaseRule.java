@@ -67,8 +67,8 @@ public class ComplexTurnRestrictionTestCaseRule extends CoreTestRule
             })
     private Atlas atlasOnly;
 
-    @TestAtlas(loadFromTextResource = "bigNodeWithManeuverMandates.txt.gz")
-    private Atlas bigNodeWithManeuverMandatesAtlas;
+    @TestAtlas(loadFromTextResource = "bigNodeWithOnlyTurnRestrictions.txt.gz")
+    private Atlas bigNodeWithOnlyTurnRestrictionsAtlas;
 
     public Atlas getAtlasNo()
     {
@@ -80,8 +80,8 @@ public class ComplexTurnRestrictionTestCaseRule extends CoreTestRule
         return this.atlasOnly;
     }
 
-    public Atlas getBigNodeWithManeuverMandatesAtlas()
+    public Atlas getBigNodeWithOnlyTurnRestrictionsAtlas()
     {
-        return this.bigNodeWithManeuverMandatesAtlas;
+        return this.bigNodeWithOnlyTurnRestrictionsAtlas;
     }
 }
