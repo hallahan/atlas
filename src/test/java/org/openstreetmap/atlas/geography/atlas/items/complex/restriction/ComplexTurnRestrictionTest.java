@@ -174,10 +174,10 @@ public class ComplexTurnRestrictionTest
     {
         final int expectedCountOfRestrictedRoutes = 302;
 
-        // There's a maneuverMandate (http://www.openstreetmap.org/relation/6643212) specifying that
-        // 447301069000000 must go to 447301070000000. This route has a corner case where an
-        // otherToOption (-447301069000000) is found before the from edge. Specifically check to
-        // make sure this path is restricted.
+        // There's a only turn restriction (http://www.openstreetmap.org/relation/6643212)
+        // specifying that 447301069000000 must go to 447301070000000. This route has a corner case
+        // where an otherToOption (-447301069000000) is found before the from edge. Specifically
+        // check to make sure this path is restricted.
         final String expectedRestrictedRoute = "[Route: 447301065000000, -447301070000000, -447301069000000, 447301069000000, 447301074000000, 447301068000000, 338286211000000]";
 
         final Atlas complexBigNodeAtlas = this.rule.getBigNodeWithManeuverMandatesAtlas();
@@ -189,10 +189,9 @@ public class ComplexTurnRestrictionTest
                 .flatMap(bigNode -> bigNode.turnRestrictions().stream())
                 .map(RestrictedPath::getRoute).collect(Collectors.toList());
 
-        // Verify that the expected number of restricted routes is returned
-        Assert.assertEquals(expectedCountOfRestrictedRoutes, restrictedRoutes.size());
-        Assert.assertTrue(restrictedRoutes.stream()
-                .anyMatch(route -> route.toString().equals(expectedRestrictedRoute)));
-
+        Assert.assertEquals("Verify that the expected number of restricted routes is returned",
+                expectedCountOfRestrictedRoutes, restrictedRoutes.size());
+        Assert.assertTrue("Verify that this explicit restricted path is returned", restrictedRoutes
+                .stream().anyMatch(route -> route.toString().equals(expectedRestrictedRoute)));
     }
 }

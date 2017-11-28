@@ -134,24 +134,30 @@ public class RouteTest
 
         final Route route = Route.forEdges(atlas.edge(159019301), atlas.edge(128620751),
                 atlas.edge(128620796));
+        final Route duplicateRoute = Route.forEdges(atlas.edge(159019301), atlas.edge(128620751),
+                atlas.edge(128620796));
         final Route multiRoute = Route.forEdges(atlas.edge(159019301), atlas.edge(128620751));
         final Route singleRoute = Route.forEdges(atlas.edge(159019301));
         final Route incorrectMultiRoute = Route.forEdges(atlas.edge(159019301),
                 atlas.edge(128620751), atlas.edge(138620888));
         final Route incorrectSingleRoute = Route.forEdge(atlas.edge(128620751));
 
-        // Verify for a multiRoute
-        Assert.assertTrue(route.startsWith(multiRoute));
-        // Verify for a singleRoute
-        Assert.assertTrue(route.startsWith(singleRoute));
+        Assert.assertTrue("Verify startsWith returns true when passing in the same route",
+                route.startsWith(duplicateRoute));
 
-        // Verify negative case for a multiRoute
-        Assert.assertFalse(route.startsWith(incorrectMultiRoute));
-        // Verify negative case for a singleRoute
-        Assert.assertFalse(route.startsWith(incorrectSingleRoute));
+        Assert.assertTrue("Verify startsWith returns true for a multiRoute",
+                route.startsWith(multiRoute));
+        Assert.assertTrue("Verify startsWith returns true for a singleRoute",
+                route.startsWith(singleRoute));
 
-        // Verify negative case where other route is longer than current route
-        Assert.assertFalse(singleRoute.startsWith(multiRoute));
+        Assert.assertFalse("Verify a startsWith negative case for a multiRoute",
+                route.startsWith(incorrectMultiRoute));
+        Assert.assertFalse("Verify a startsWith negative case for a singleRoute",
+                route.startsWith(incorrectSingleRoute));
+
+        Assert.assertFalse(
+                "Verify startsWith returns false when other route is longer than current route",
+                singleRoute.startsWith(multiRoute));
     }
 
     @Test
@@ -176,16 +182,16 @@ public class RouteTest
         Assert.assertTrue(longerRoute.isSubRoute(shorterRoute));
 
         // subRoute tests
-        // subroute the last edge of longer route - this should result in a route identical to
-        // shorterRoute
-        Assert.assertEquals(shorterRoute, longerRoute.subRoute(0, shorterRoute.size()));
+        Assert.assertEquals("Subroute the last edge from a route", shorterRoute,
+                longerRoute.subRoute(0, shorterRoute.size()));
 
-        // subRoute the first edge of longer route - this should result in a route identical to
-        // partialLongerRoute
-        Assert.assertEquals(partialLongerRoute, longerRoute.subRoute(1, longerRoute.size()));
+        Assert.assertEquals("Subroute the first edge from a route", partialLongerRoute,
+                longerRoute.subRoute(1, longerRoute.size()));
 
-        // subRoute the middle edge of the longer route - this should result in a route identical to
-        // middleEdgeRoute
-        Assert.assertEquals(middleEdgeRoute, longerRoute.subRoute(1, 2));
+        Assert.assertEquals("Subroute a middle edge from a route", middleEdgeRoute,
+                longerRoute.subRoute(1, 2));
+
+        Assert.assertEquals("Subroute the entire route", longerRoute,
+                longerRoute.subRoute(0, longerRoute.size()));
     }
 }
