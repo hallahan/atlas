@@ -170,10 +170,6 @@ public abstract class HttpResource extends AbstractResource
                 }
                 client = clientBuilder.build();
                 context = createBasicAuthCache(target, context);
-                if (!this.creds.isPresent() && !this.proxy.isPresent())
-                {
-                    client = HttpClients.createDefault();
-                }
                 this.response = client.execute(target, this.request, context);
             }
             if (this.response.getEntity() == null)
