@@ -154,7 +154,6 @@ public abstract class HttpResource extends AbstractResource
                 final HttpHost target = new HttpHost(this.uri.getHost(), this.uri.getPort(),
                         this.uri.getScheme());
                 HttpClientContext context = HttpClientContext.create();
-                CloseableHttpClient client;
                 HttpClientBuilder clientBuilder = HttpClients.custom();
                 if (this.creds.isPresent())
                 {
@@ -168,7 +167,7 @@ public abstract class HttpResource extends AbstractResource
                 {
                     clientBuilder = clientBuilder.setProxy(this.proxy.get());
                 }
-                client = clientBuilder.build();
+                final CloseableHttpClient client = clientBuilder.build();
                 context = createBasicAuthCache(target, context);
                 this.response = client.execute(target, this.request, context);
             }
