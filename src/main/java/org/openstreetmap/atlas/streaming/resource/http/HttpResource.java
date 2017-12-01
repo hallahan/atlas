@@ -164,7 +164,7 @@ public abstract class HttpResource extends AbstractResource
                             this.creds.get());
                     clientBuilder = clientBuilder.setDefaultCredentialsProvider(credsProvider);
                 }
-                else if (this.proxy.isPresent())
+                if (this.proxy.isPresent())
                 {
                     clientBuilder = clientBuilder.setProxy(this.proxy.get());
                 }
