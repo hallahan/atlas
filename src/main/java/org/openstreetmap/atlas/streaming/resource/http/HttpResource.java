@@ -40,6 +40,21 @@ public abstract class HttpResource extends AbstractResource
     private final URI uri;
     private CloseableHttpResponse response = null;
     private Optional<UsernamePasswordCredentials> creds = Optional.empty();
+    private Optional<HttpHost> proxy = Optional.empty();
+
+    private static HttpClientContext createBasicAuthCache(final HttpHost target,
+            final HttpClientContext context)
+    {
+        // Create AuthCache instance
+        final AuthCache authCache = new BasicAuthCache();
+        // Generate BASIC scheme object and add it to the local
+        // auth cache
+        final BasicScheme basicAuth = new BasicScheme();
+        authCache.put(target, basicAuth);
+        // Add AuthCache to the execution context
+        context.setAuthCache(authCache);
+        return context;
+    }
 
     public HttpResource(final String uri)
     {
@@ -118,6 +133,11 @@ public abstract class HttpResource extends AbstractResource
         this.request.setHeader(name, value);
     }
 
+    public void setProxy(final HttpHost proxy)
+    {
+        this.proxy = Optional.of(proxy);
+    }
+
     public void setRequest(final HttpRequestBase request)
     {
         this.request = request;
@@ -132,9 +152,19 @@ public abstract class HttpResource extends AbstractResource
             {
                 final HttpHost target = new HttpHost(this.uri.getHost(), this.uri.getPort(),
                         this.uri.getScheme());
-                final HttpClientContext context = HttpClientContext.create();
+                HttpClientContext context = HttpClientContext.create();
                 final CloseableHttpClient client;
-                if (this.creds.isPresent())
+                if (this.creds.isPresent() && this.proxy.isPresent())
+                {
+                    final CredentialsProvider credsProvider = new BasicCredentialsProvider();
+                    credsProvider.setCredentials(
+                            new AuthScope(target.getHostName(), target.getPort()),
+                            this.creds.get());
+                    client = HttpClients.custom().setDefaultCredentialsProvider(credsProvider)
+                            .setProxy(this.proxy.get()).build();
+                    context = createBasicAuthCache(target, context);
+                }
+                else if (this.creds.isPresent())
                 {
                     final CredentialsProvider credsProvider = new BasicCredentialsProvider();
                     credsProvider.setCredentials(
@@ -142,16 +172,12 @@ public abstract class HttpResource extends AbstractResource
                             this.creds.get());
                     client = HttpClients.custom().setDefaultCredentialsProvider(credsProvider)
                             .build();
-                    // Create AuthCache instance
-                    final AuthCache authCache = new BasicAuthCache();
-
-                    // Generate BASIC scheme object and add it to the local
-                    // auth cache
-                    final BasicScheme basicAuth = new BasicScheme();
-                    authCache.put(target, basicAuth);
-
-                    // Add AuthCache to the execution context
-                    context.setAuthCache(authCache);
+                    context = createBasicAuthCache(target, context);
+                }
+                else if (this.proxy.isPresent())
+                {
+                    client = HttpClients.custom().setProxy(this.proxy.get()).build();
+                    context = createBasicAuthCache(target, context);
                 }
                 else
                 {
