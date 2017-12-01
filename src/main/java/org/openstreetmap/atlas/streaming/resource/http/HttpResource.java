@@ -19,6 +19,7 @@ import org.apache.http.impl.auth.BasicScheme;
 import org.apache.http.impl.client.BasicAuthCache;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.openstreetmap.atlas.exception.CoreException;
 import org.openstreetmap.atlas.streaming.StringInputStream;
@@ -135,7 +136,7 @@ public abstract class HttpResource extends AbstractResource
 
     public void setProxy(final HttpHost proxy)
     {
-        this.proxy = Optional.of(proxy);
+        this.proxy = Optional.ofNullable(proxy);
     }
 
     public void setRequest(final HttpRequestBase request)
@@ -153,37 +154,26 @@ public abstract class HttpResource extends AbstractResource
                 final HttpHost target = new HttpHost(this.uri.getHost(), this.uri.getPort(),
                         this.uri.getScheme());
                 HttpClientContext context = HttpClientContext.create();
-                final CloseableHttpClient client;
-                if (this.creds.isPresent() && this.proxy.isPresent())
+                CloseableHttpClient client;
+                HttpClientBuilder clientBuilder = HttpClients.custom();
+                if (this.creds.isPresent())
                 {
                     final CredentialsProvider credsProvider = new BasicCredentialsProvider();
                     credsProvider.setCredentials(
                             new AuthScope(target.getHostName(), target.getPort()),
                             this.creds.get());
-                    client = HttpClients.custom().setDefaultCredentialsProvider(credsProvider)
-                            .setProxy(this.proxy.get()).build();
-                    context = createBasicAuthCache(target, context);
-                }
-                else if (this.creds.isPresent())
-                {
-                    final CredentialsProvider credsProvider = new BasicCredentialsProvider();
-                    credsProvider.setCredentials(
-                            new AuthScope(target.getHostName(), target.getPort()),
-                            this.creds.get());
-                    client = HttpClients.custom().setDefaultCredentialsProvider(credsProvider)
-                            .build();
-                    context = createBasicAuthCache(target, context);
+                    clientBuilder = clientBuilder.setDefaultCredentialsProvider(credsProvider);
                 }
                 else if (this.proxy.isPresent())
                 {
-                    client = HttpClients.custom().setProxy(this.proxy.get()).build();
-                    context = createBasicAuthCache(target, context);
+                    clientBuilder = clientBuilder.setProxy(this.proxy.get());
                 }
-                else
+                client = clientBuilder.build();
+                context = createBasicAuthCache(target, context);
+                if (!this.creds.isPresent() && !this.proxy.isPresent())
                 {
                     client = HttpClients.createDefault();
                 }
-
                 this.response = client.execute(target, this.request, context);
             }
             if (this.response.getEntity() == null)
