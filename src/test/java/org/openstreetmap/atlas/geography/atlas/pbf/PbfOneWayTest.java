@@ -6,6 +6,7 @@ import org.openstreetmap.atlas.geography.atlas.pbf.store.PbfOneWay;
 import org.openstreetmap.atlas.tags.AccessTag;
 import org.openstreetmap.atlas.tags.HighwayTag;
 import org.openstreetmap.atlas.tags.JunctionTag;
+import org.openstreetmap.atlas.tags.MotorVehicleTag;
 import org.openstreetmap.atlas.tags.OneWayTag;
 import org.openstreetmap.atlas.tags.Taggable;
 
@@ -24,6 +25,15 @@ public class PbfOneWayTest
         final Taggable closedNeighborhood = Taggable.with(HighwayTag.KEY,
                 HighwayTag.PRIMARY.name().toLowerCase(), AccessTag.KEY,
                 AccessTag.NO.name().toLowerCase());
+        final Taggable closedNeighborhoodButOpenForMotorVehicles = Taggable.with(HighwayTag.KEY,
+                HighwayTag.PRIMARY.name().toLowerCase(), AccessTag.KEY,
+                AccessTag.NO.name().toLowerCase(), MotorVehicleTag.KEY,
+                MotorVehicleTag.YES.name().toLowerCase());
+        final Taggable closedNeighborhoodButOpenForMotorVehiclesOneWay = Taggable.with(
+                HighwayTag.KEY, HighwayTag.PRIMARY.name().toLowerCase(), AccessTag.KEY,
+                AccessTag.NO.name().toLowerCase(), MotorVehicleTag.KEY,
+                MotorVehicleTag.YES.name().toLowerCase(), OneWayTag.KEY,
+                OneWayTag.TRUE.name().toLowerCase());
         final Taggable motorway = Taggable.with(HighwayTag.KEY,
                 HighwayTag.MOTORWAY.name().toLowerCase());
         final Taggable twoWayMotorway = Taggable.with(HighwayTag.KEY,
@@ -64,12 +74,16 @@ public class PbfOneWayTest
         Assert.assertEquals(PbfOneWay.NO, PbfOneWay.forTag(explicitlyTwoWay));
         Assert.assertEquals(PbfOneWay.NO, PbfOneWay.forTag(explicitlyTwoWayUsingZero));
         Assert.assertEquals(PbfOneWay.NO, PbfOneWay.forTag(explicitlyTwoWayUsingFalse));
+        Assert.assertEquals(PbfOneWay.NO,
+                PbfOneWay.forTag(closedNeighborhoodButOpenForMotorVehicles));
 
         Assert.assertEquals(PbfOneWay.YES, PbfOneWay.forTag(motorway));
         Assert.assertEquals(PbfOneWay.YES, PbfOneWay.forTag(roundabout));
         Assert.assertEquals(PbfOneWay.YES, PbfOneWay.forTag(explicitlyOneWay));
         Assert.assertEquals(PbfOneWay.YES, PbfOneWay.forTag(explicitlyOneWayUsingTrue));
         Assert.assertEquals(PbfOneWay.YES, PbfOneWay.forTag(explicitlyOneWayUsingOne));
+        Assert.assertEquals(PbfOneWay.YES,
+                PbfOneWay.forTag(closedNeighborhoodButOpenForMotorVehiclesOneWay));
 
         Assert.assertEquals(PbfOneWay.CLOSED, PbfOneWay.forTag(closedNeighborhood));
         Assert.assertEquals(PbfOneWay.CLOSED, PbfOneWay.forTag(oneWayReversible));
