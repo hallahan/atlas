@@ -25,13 +25,8 @@ public enum PbfOneWay
 
     public static PbfOneWay forTag(final Taggable taggable)
     {
-        if (AccessTag.isNo(taggable)
-                && !Validators.isOfType(taggable, MotorVehicleTag.class, MotorVehicleTag.YES)
-                && !Validators.isOfType(taggable, MotorcarTag.class, MotorcarTag.YES)
-                && !Validators.isOfType(taggable, VehicleTag.class, VehicleTag.YES))
+        if (isNotAccessibleToVehicles(taggable))
         {
-            // If way has "access=no" tag and does not have "motor_vehicle=yes", "motorcar=yes"
-            // or "vehicle=yes" tags combined with it, then this way is closed for motor vehicles
             return CLOSED;
         }
         else if (OneWayTag.isExplicitlyTwoWay(taggable))
@@ -66,5 +61,15 @@ public enum PbfOneWay
         {
             return NO;
         }
+    }
+
+    private static boolean isNotAccessibleToVehicles(final Taggable taggable)
+    {
+        // If way has "access=no" tag and does not have "motor_vehicle=yes", "motorcar=yes"
+        // or "vehicle=yes" tags combined with it, then this way is closed for motor vehicles
+        return AccessTag.isNo(taggable)
+                && !Validators.isOfType(taggable, MotorVehicleTag.class, MotorVehicleTag.YES)
+                && !Validators.isOfType(taggable, MotorcarTag.class, MotorcarTag.YES)
+                && !Validators.isOfType(taggable, VehicleTag.class, VehicleTag.YES);
     }
 }
