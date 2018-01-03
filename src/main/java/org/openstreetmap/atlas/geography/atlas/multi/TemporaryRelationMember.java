@@ -25,7 +25,7 @@ public final class TemporaryRelationMember
     @Override
     public boolean equals(final Object other)
     {
-        if (other instanceof TemporaryRelation)
+        if (other instanceof TemporaryRelationMember)
         {
             final TemporaryRelationMember that = (TemporaryRelationMember) other;
             return this.getIdentifier() == that.getIdentifier() && this.getRole().equals(that.role)
