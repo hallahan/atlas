@@ -22,7 +22,7 @@ builds:
   - branchName: apple
     name: master-release
     build:
-      template: gradle:v3:app:release
+      template: buildozer:v1:publish
     trigger:
       gitPush: false
     publish:
