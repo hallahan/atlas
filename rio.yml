@@ -15,12 +15,13 @@ publish:
 builds:
 # apple-prb
   - branchName: apple
+    name: apple-prb
     build:
       template: buildozer:v1:prb
 
 # apple-release
   - branchName: apple
-    name: master-release
+    name: apple-release
     build:
       template: buildozer:v1:publish
     trigger:
@@ -30,6 +31,7 @@ builds:
 
 # release-prb
   - branchName: release
+    name: release-prb
     build:
       template: buildozer:v1:prb
 
