@@ -16,6 +16,7 @@ import org.openstreetmap.atlas.geography.Longitude;
 import org.openstreetmap.atlas.geography.PolyLine;
 import org.openstreetmap.atlas.geography.Polygon;
 import org.openstreetmap.atlas.geography.atlas.Atlas;
+import org.openstreetmap.atlas.geography.atlas.AtlasMetaData;
 import org.openstreetmap.atlas.geography.atlas.builder.AtlasSize;
 import org.openstreetmap.atlas.geography.atlas.builder.RelationBean;
 import org.openstreetmap.atlas.geography.atlas.builder.text.TextAtlasBuilder;
@@ -32,6 +33,7 @@ import org.openstreetmap.atlas.tags.BuildingPartTag;
 import org.openstreetmap.atlas.tags.BuildingTag;
 import org.openstreetmap.atlas.tags.RelationTypeTag;
 import org.openstreetmap.atlas.tags.annotations.validation.Validators;
+import org.openstreetmap.atlas.utilities.collections.Maps;
 import org.openstreetmap.atlas.utilities.collections.StringList;
 import org.openstreetmap.atlas.utilities.testing.TestAtlas.Area;
 import org.openstreetmap.atlas.utilities.testing.TestAtlas.Area.Known;
@@ -113,7 +115,20 @@ public class TestAtlasHandler implements FieldHandler
         {
             try
             {
-                loadFromJosmOsmResource(field, rule, context, testAtlas.loadFromJosmOsmResource());
+                loadFromJosmOsmResource(field, rule, context, testAtlas.loadFromJosmOsmResource(),
+                        true);
+            }
+            catch (final Throwable e)
+            {
+                throw new CoreException("Error creating field {}", field, e);
+            }
+        }
+        else if (StringUtils.isNotEmpty(testAtlas.loadFromOsmResource()))
+        {
+            try
+            {
+                loadFromJosmOsmResource(field, rule, context, testAtlas.loadFromOsmResource(),
+                        false);
             }
             catch (final Throwable e)
             {
@@ -204,8 +219,18 @@ public class TestAtlasHandler implements FieldHandler
     {
 
         final PackedAtlasBuilder builder = new PackedAtlasBuilder();
-        builder.setSizeEstimates(convertSizeEstimates(testAtlas.size()));
-
+        final AtlasSize size = convertSizeEstimates(testAtlas.size());
+        final String iso = testAtlas.iso();
+        if (!iso.equals(TestAtlas.UNKNOWN_ISO_COUNTRY))
+        {
+            final AtlasMetaData metaData = new AtlasMetaData(size, true, null, null, iso, null,
+                    Maps.hashMap());
+            builder.withMetaData(metaData);
+        }
+        else
+        {
+            builder.setSizeEstimates(size);
+        }
         handle(builder, testAtlas.nodes());
         handle(builder, testAtlas.edges());
         handle(builder, testAtlas.areas());
@@ -336,7 +361,7 @@ public class TestAtlasHandler implements FieldHandler
     }
 
     private void loadFromJosmOsmResource(final Field field, final CoreTestRule rule,
-            final CreationContext context, final String resourcePath)
+            final CreationContext context, final String resourcePath, final boolean josmFormat)
     {
         final String packageName = rule.getClass().getPackage().getName().replaceAll("\\.", "/");
         final String completeName = String.format("%s/%s", packageName, resourcePath);
@@ -350,10 +375,19 @@ public class TestAtlasHandler implements FieldHandler
         });
         try
         {
-            final StringResource osmFile = new StringResource();
-            new OsmFileParser().update(resource, osmFile);
             final ByteArrayResource pbfFile = new ByteArrayResource();
-            new OsmFileToPbf().update(osmFile, pbfFile);
+            if (josmFormat)
+            {
+                // If the XML file is in JOSM format, fix it to look like an OSM file
+                final StringResource osmFile = new StringResource();
+                new OsmFileParser().update(resource, osmFile);
+                new OsmFileToPbf().update(osmFile, pbfFile);
+            }
+            else
+            {
+                new OsmFileToPbf().update(resource, pbfFile);
+            }
+
             field.set(rule, new OsmPbfLoader(pbfFile, AtlasLoadingOption.withNoFilter()).read());
         }
         catch (IllegalArgumentException | IllegalAccessException e)
