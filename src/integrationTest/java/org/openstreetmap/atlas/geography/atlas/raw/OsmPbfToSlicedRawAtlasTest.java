@@ -210,7 +210,7 @@ public class OsmPbfToSlicedRawAtlasTest
         logger.info(finalAtlas.summary());
     }
 
-    @Test
+    // TODO @Test
     public void testSectioningFromShard()
     {
         final String path = OsmPbfToSlicedRawAtlasTest.class.getResource("8-122-122.osm.pbf")
