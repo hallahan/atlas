@@ -1,0 +1,46 @@
+# internal project uses simpler one-branch scheme: internal branch only. No dev to master etc, as that is handled in the public version.
+# dev and master come from the public version and should be touched only when the public changes are merged in
+
+schemaVersion: '2.0'
+timeout: 30
+machine:
+  java:
+    version: 1.8
+# Publishing to repository without include/exclude setting,
+# otherwise org artifacts are filtered out.
+publish:
+  libraries:
+    repo: m2:oss-patched
+
+builds:
+# apple-prb
+  - branchName: apple
+    name: apple-prb
+    build:
+      template: buildozer:v1:prb
+
+# apple-release
+  - branchName: apple
+    name: apple-release
+    build:
+      template: buildozer:v1:publish
+    trigger:
+      gitPush: false
+    publish:
+      release: true
+
+# release-prb
+  - branchName: release
+    name: release-prb
+    build:
+      template: buildozer:v1:prb
+
+# build master to a release, when needed
+  - branchName: release
+    name: release-release
+    build:
+      template: gradle:v3:app:release
+    trigger:
+      gitPush: false
+    publish:
+      release: true
