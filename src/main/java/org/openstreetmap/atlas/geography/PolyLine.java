@@ -47,6 +47,7 @@ public class PolyLine implements Collection<Location>, Located, Serializable
     private static final long serialVersionUID = -3291779878869865427L;
     protected static final int SIMPLE_STRING_LENGTH = 200;
     private static final Logger logger = LoggerFactory.getLogger(PolyLine.class);
+    private static final String IMMUTABLE_POLYLINE = "A polyline is immutable";
 
     public static final PolyLine TEST_POLYLINE = new PolyLine(Location.TEST_3, Location.TEST_7,
             Location.TEST_4, Location.TEST_1, Location.TEST_5);
@@ -80,9 +81,10 @@ public class PolyLine implements Collection<Location>, Located, Serializable
     public static void saveAsGeoJson(final Iterable<? extends Iterable<Location>> geometries,
             final WritableResource resource)
     {
-        final JsonWriter writer = new JsonWriter(resource);
-        writer.write(asGeoJson(geometries).jsonObject());
-        writer.close();
+        try (JsonWriter writer = new JsonWriter(resource))
+        {
+            writer.write(asGeoJson(geometries).jsonObject());
+        }
     }
 
     /**
@@ -328,7 +330,7 @@ public class PolyLine implements Collection<Location>, Located, Serializable
     @Override
     public void clear()
     {
-        throw new IllegalAccessError("A polyline is immutable");
+        throw new IllegalAccessError(IMMUTABLE_POLYLINE);
     }
 
     /**
@@ -872,19 +874,19 @@ public class PolyLine implements Collection<Location>, Located, Serializable
     @Override
     public boolean remove(final Object object)
     {
-        throw new IllegalAccessError("A polyline is immutable");
+        throw new IllegalAccessError(IMMUTABLE_POLYLINE);
     }
 
     @Override
     public boolean removeAll(final Collection<?> collection)
     {
-        throw new IllegalAccessError("A polyline is immutable");
+        throw new IllegalAccessError(IMMUTABLE_POLYLINE);
     }
 
     @Override
     public boolean retainAll(final Collection<?> collection)
     {
-        throw new IllegalAccessError("A polyline is immutable");
+        throw new IllegalAccessError(IMMUTABLE_POLYLINE);
     }
 
     public PolyLine reversed()
