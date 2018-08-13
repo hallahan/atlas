@@ -154,7 +154,10 @@ public class Diff implements Comparable<Diff>, Serializable
                             {
                                 relation = (Relation) diff.getAlterEntity();
                             }
-                            return processRelationForGeoJson(relation, new HashMap<>());
+                            final Map<String, String> tags = new HashMap<>();
+                            tags.put("DIFF_TYPE", diff.getDiffType().name());
+                            tags.put("DIFF_REASON", diff.getDiffReason().name());
+                            return processRelationForGeoJson(relation, tags);
                         })//
                         .collect())
                 .jsonObject().toString();
