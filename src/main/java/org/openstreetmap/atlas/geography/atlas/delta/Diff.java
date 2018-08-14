@@ -100,23 +100,47 @@ public class Diff implements Comparable<Diff>, Serializable
      */
     public static String toGeoJson(final Iterable<Diff> diffs, final Predicate<Diff> filter)
     {
-        return new GeoJsonBuilder().create(Iterables.stream(diffs)
-                .filter(diff -> diff.getItemType() != ItemType.RELATION).filter(filter).map(diff ->
-                {
-                    final AtlasItem item;
-                    if (diff.getDiffType() == DiffType.REMOVED)
-                    {
-                        item = (AtlasItem) diff.getBaseEntity();
-                    }
-                    else
-                    {
-                        item = (AtlasItem) diff.getAlterEntity();
-                    }
-                    final Map<String, String> tags = item.getTags();
-                    tags.put("DIFF_TYPE", diff.getDiffType().name());
-                    tags.put("DIFF_REASON", diff.getDiffReason().name());
-                    return new LocationIterableProperties(item.getRawGeometry(), tags);
-                }).collect()).jsonObject().toString();
+        final List<LocationIterableProperties> locationIterablePropertiesList = new ArrayList<>();
+        Iterables.stream(diffs).filter(diff -> diff.getItemType() != ItemType.RELATION).filter(filter).forEach(diff ->
+        {
+            final DiffType diffType = diff.getDiffType();
+
+            final AtlasItem item;
+            final Map<String, String> itemTags;
+            // Get the entity that was removed.
+            if (diffType == DiffType.REMOVED)
+            {
+                item = (AtlasItem) diff.getBaseEntity();
+                itemTags = item.getTags();
+                itemTags.put("diff", "before");
+            }
+            // For an entity that was added or modified, we need the after.
+            else
+            {
+                item = (AtlasItem) diff.getAlterEntity();
+                itemTags = item.getTags();
+                itemTags.put("diff", "after");
+            }
+
+            itemTags.put("diff:type", diff.getDiffType().name());
+            itemTags.put("dif:reason", diff.getDiffReason().name());
+
+            locationIterablePropertiesList.add(new LocationIterableProperties(item.getRawGeometry(), itemTags));
+
+            // Gets the base (before) part of the change and also includes this.
+            if (diffType == DiffType.CHANGED)
+            {
+                final AtlasItem beforeItem = (AtlasItem) diff.getBaseEntity();
+                final Map<String, String> beforeItemTags = beforeItem.getTags();
+                beforeItemTags.put("diff", "before");
+                beforeItemTags.put("diff:type", diff.getDiffType().name());
+                beforeItemTags.put("diff:reason", diff.getDiffReason().name());
+
+                locationIterablePropertiesList.add(new LocationIterableProperties(beforeItem.getRawGeometry(), beforeItemTags));
+            }
+        });
+
+        return new GeoJsonBuilder().create(locationIterablePropertiesList).jsonObject().toString();
     }
 
     /**
