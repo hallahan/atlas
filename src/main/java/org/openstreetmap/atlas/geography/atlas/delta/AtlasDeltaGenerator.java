@@ -72,7 +72,7 @@ public class AtlasDeltaGenerator extends Command
         this.logger.info("Saved GeoJSON file {}", geoJsonFile);
 
         final String relationsGeoJson = delta.toRelationsGeoJson();
-        final String relationsGeoJsonFileName = name + "-relations" + FileSuffix.GEO_JSON.toString();
+        final String relationsGeoJsonFileName = name + "_relations" + FileSuffix.GEO_JSON.toString();
         final File relationsGeoJsonFile = new File(outputDir.resolve(relationsGeoJsonFileName).toFile());
         relationsGeoJsonFile.writeAndClose(relationsGeoJson);
         this.logger.info("Saved Relations GeoJSON file {}", relationsGeoJsonFile);

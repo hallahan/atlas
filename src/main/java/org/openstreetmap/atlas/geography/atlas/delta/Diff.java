@@ -100,47 +100,56 @@ public class Diff implements Comparable<Diff>, Serializable
      */
     public static String toGeoJson(final Iterable<Diff> diffs, final Predicate<Diff> filter)
     {
-        final List<LocationIterableProperties> locationIterablePropertiesList = new ArrayList<>();
-        Iterables.stream(diffs).filter(diff -> diff.getItemType() != ItemType.RELATION).filter(filter).forEach(diff ->
-        {
-            final DiffType diffType = diff.getDiffType();
+        return new GeoJsonBuilder().create(Iterables.stream(diffs)
+                .filter(diff -> diff.getItemType() != ItemType.RELATION)
+                .filter(filter)
+                .flatMap(Diff::processDiff)
+                .collect())
+                .jsonObject()
+                .toString();
+    }
 
-            final AtlasItem item;
-            final Map<String, String> itemTags;
-            // Get the entity that was removed.
-            if (diffType == DiffType.REMOVED)
+    private static List<LocationIterableProperties> processDiff(final Diff diff)
+    {
+        final List<LocationIterableProperties> items = new ArrayList<>();
+
+        final AtlasEntity beforeEntity = diff.getBaseEntity();
+        // null if it is ADDED
+        if (beforeEntity != null)
+        {
+            final Map<String, String> beforeTags = beforeEntity.getTags();
+            beforeTags.put("diff", "BEFORE");
+            beforeTags.put("diff:type", diff.getDiffType().name());
+            beforeTags.put("dif:reason", diff.getDiffReason().name());
+            if (diff.getItemType() == ItemType.RELATION)
             {
-                item = (AtlasItem) diff.getBaseEntity();
-                itemTags = item.getTags();
-                itemTags.put("diff", "BEFORE");
+                items.addAll(processRelationForGeoJson((Relation) beforeEntity, beforeTags));
             }
-            // For an entity that was added or modified, we need the after.
             else
             {
-                item = (AtlasItem) diff.getAlterEntity();
-                itemTags = item.getTags();
-                itemTags.put("diff", "AFTER");
+                items.add(new LocationIterableProperties(((AtlasItem) beforeEntity).getRawGeometry(), beforeTags));
             }
+        }
 
-            itemTags.put("diff:type", diff.getDiffType().name());
-            itemTags.put("dif:reason", diff.getDiffReason().name());
-
-            locationIterablePropertiesList.add(new LocationIterableProperties(item.getRawGeometry(), itemTags));
-
-            // Gets the base (before) part of the change and also includes this.
-            if (diffType == DiffType.CHANGED)
+        final AtlasEntity afterEntity = diff.getAlterEntity();
+        // null iff it is REMOVED
+        if (afterEntity != null)
+        {
+            final Map<String, String> afterTags = afterEntity.getTags();
+            afterTags.put("diff", "AFTER");
+            afterTags.put("diff:type", diff.getDiffType().name());
+            afterTags.put("dif:reason", diff.getDiffReason().name());
+            if (diff.getItemType() == ItemType.RELATION)
             {
-                final AtlasItem beforeItem = (AtlasItem) diff.getBaseEntity();
-                final Map<String, String> beforeItemTags = beforeItem.getTags();
-                beforeItemTags.put("diff", "BEFORE");
-                beforeItemTags.put("diff:type", diff.getDiffType().name());
-                beforeItemTags.put("diff:reason", diff.getDiffReason().name());
-
-                locationIterablePropertiesList.add(new LocationIterableProperties(beforeItem.getRawGeometry(), beforeItemTags));
+                items.addAll(processRelationForGeoJson((Relation) afterEntity, afterTags));
             }
-        });
+            else
+            {
+                items.add(new LocationIterableProperties(((AtlasItem) afterEntity).getRawGeometry(), afterTags));
+            }
+        }
 
-        return new GeoJsonBuilder().create(locationIterablePropertiesList).jsonObject().toString();
+        return items;
     }
 
     /**
@@ -165,43 +174,13 @@ public class Diff implements Comparable<Diff>, Serializable
     public static String toRelationsGeoJson(final Iterable<Diff> diffs,
             final Predicate<Diff> filter)
     {
-        final List<LocationIterableProperties> locationIterablePropertiesList = new ArrayList<>();
-        Iterables.stream(diffs).filter(diff -> diff.getItemType() == ItemType.RELATION).filter(filter).forEach(diff ->
-        {
-            final Relation relation;
-            final Map<String, String> tags;
-            final DiffType diffType = diff.getDiffType();
-            if (diffType == DiffType.REMOVED)
-            {
-                relation = (Relation) diff.getBaseEntity();
-                tags = relation.getTags();
-                tags.put("diff", "BEFORE");
-            }
-            else
-            {
-                relation = (Relation) diff.getAlterEntity();
-                tags = relation.getTags();
-                tags.put("diff", "AFTER");
-            }
-
-            tags.put("diff:type", diff.getDiffType().name());
-            tags.put("diff:reason", diff.getDiffReason().name());
-
-            locationIterablePropertiesList.addAll(processRelationForGeoJson(relation, tags));
-
-            if (diffType == DiffType.CHANGED)
-            {
-                final Relation beforeRelation = (Relation) diff.getBaseEntity();
-                final Map<String, String> beforeTags = beforeRelation.getTags();
-                beforeTags.put("diff", "BEFORE");
-                beforeTags.put("diff:type", diff.getDiffType().name());
-                beforeTags.put("diff:reason", diff.getDiffReason().name());
-
-                locationIterablePropertiesList.addAll(processRelationForGeoJson(beforeRelation, beforeTags));
-            }
-        });
-
-        return new GeoJsonBuilder().create(locationIterablePropertiesList).jsonObject().toString();
+        return new GeoJsonBuilder().create(Iterables.stream(diffs)
+                .filter(diff -> diff.getItemType() == ItemType.RELATION)
+                .filter(filter)
+                .flatMap(Diff::processDiff)
+                .collect())
+                .jsonObject()
+                .toString();
     }
 
     /**
